@@ -19,6 +19,7 @@ int main(void)
         }
     }
     //平台退出函数
+    printf("退出\r\n");
     platform_out();
     return 0;
 }

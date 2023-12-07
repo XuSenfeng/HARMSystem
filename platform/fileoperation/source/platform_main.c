@@ -85,7 +85,7 @@ int platform_is_right(char *id, char *passwd, message_to_login_t * message)
 }
 
 //根据一个人的id以及密码判断是否登陆成功,成功的话返回对应的那个人的结构体
-void *platform_login(int8_t *id, int8_t *passwd, int8_t choice)
+int32_t platform_login(int8_t *id, int8_t *passwd, int8_t choice)
 {
     ListItem_t *list_to_use;
     doctor_t *doctor;
@@ -97,7 +97,7 @@ void *platform_login(int8_t *id, int8_t *passwd, int8_t choice)
         //printf("管理员登录\r\n");
         if(platform_is_right(id, passwd, &manager.login)==1)
         {
-            return &manager;
+            return 1;
         }else
             return -1;
         
@@ -111,7 +111,7 @@ void *platform_login(int8_t *id, int8_t *passwd, int8_t choice)
         while(num_to_get--)
         {
             if(platform_is_right(id, passwd, &doctor->login)==1){
-                return doctor;
+                return 1;
             }
             list_to_use = listGET_NEXT(list_to_use);
             doctor = (doctor_t *)listGET_LIST_ITEM_OWNER(list_to_use);
@@ -129,7 +129,7 @@ void *platform_login(int8_t *id, int8_t *passwd, int8_t choice)
         while(num_to_get--)
         {
             if(platform_is_right(id, passwd, &patient->login)==1){
-                return patient;
+                return 1;
             }
             list_to_use = listGET_NEXT(list_to_use);
             patient = (patient_t *)listGET_LIST_ITEM_OWNER(list_to_use);
@@ -156,6 +156,7 @@ void platform_update(){
 //平台退出函数,主要用于释放空间
 void platform_out()
 {
+    ListItem_t *list_now, *list_next;
     doctor_t *doctor;
     patient_t *patient;
     //把当前的数据存储起来
@@ -163,12 +164,16 @@ void platform_out()
     //释放内存
     while(listCURRENT_LIST_LENGTH(&manager.doctors_LM))
     {
-        doctor = listGET_HEAD_ENTRY(&manager.doctors_LM);
-        uxListRemove(doctor);
+        list_now = listGET_HEAD_ENTRY(&manager.doctors_LM);
+        doctor = listGET_LIST_ITEM_OWNER(list_now);
+        uxListRemove(list_now);
+        free(doctor);
     }
     while(listCURRENT_LIST_LENGTH(&manager.patient_LM))
     {
-        patient = listGET_HEAD_ENTRY(&manager.patient_LM);
-        uxListRemove(doctor);
+        list_now = listGET_HEAD_ENTRY(&manager.patient_LM);
+        patient = listGET_LIST_ITEM_OWNER(list_now);
+        uxListRemove(list_now);
+        free(patient);
     }
 }
