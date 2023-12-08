@@ -12,6 +12,8 @@
 #define FIRST_VISIT_DOCTOR              1
 #define SUBSQUENT_VISIT                 2
 
+//²âÊÔ´úÂë¿ª¹Ø
+#define DEBUG                           0
 typedef struct
 {
     int8_t id[21];
@@ -60,6 +62,7 @@ typedef struct{
     message_to_login_t login;
     ListItem_t manage_L;
     ListItem_t doctor_L;
+    char doc_id[21];
 }patient_t;
 
 void platform_init();

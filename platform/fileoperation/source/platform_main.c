@@ -13,7 +13,7 @@ void platform_test(void)
     doctor_list = listGET_HEAD_ENTRY(&manager.doctors_LM);
     doctor = (doctor_t *)listGET_LIST_ITEM_OWNER(doctor_list);
     printf("医生的信息: %s %s %s\r\n", doctor->login.id, doctor->login.name, doctor->login.passwd);
-    platform_init_patient("张振辉", "222", "123456");
+    platform_add_patient("史凯歌", "222", "123456", 0, "1001");
     patient_list = listGET_HEAD_ENTRY(&manager.patient_LM);
     patient = (patient_t *)listGET_LIST_ITEM_OWNER(patient_list);
     printf("患者的信息: %s %s %s\r\n", patient->login.id, patient->login.name, patient->login.passwd);
@@ -29,23 +29,23 @@ void platform_test(void)
     }
 
 }
-
+//对文件进行读操作
 void platform_department_init(void)
 {
     //部门初始化
     FILE *message_f;
-    int32_t i, j, management_num, service_num;
+    int32_t i, j, management_num, service_num, patient_num;
     one_department_t *department;
     outpatient_service_t *service;
-    ListItem_t *list_test, *list_test2;
+
     int8_t name[21];
     //医生初始化
     int32_t doctor_num;
-    int8_t id[21], passwd[21], work[20]; 
+    int8_t id[21], passwd[30], work[20], status; 
 
     message_f = fopen("document.txt", "r");
     fscanf(message_f, "%d", &management_num);
-    printf("*******部门初始化*****%d\r\n", management_num);
+    //printf("*******部门初始化*****%d\r\n", management_num);
     for(i=0;i<management_num;i++)
     {
         //读取格式化的部门信息
@@ -58,7 +58,9 @@ void platform_department_init(void)
             platform_init_service(name, department);
         }
     }
-    /**/
+#if DEBUG
+    ListItem_t *list_test, *list_test2;
+    /*测试代码, 会显示现在已经注册的所有的部门以及门诊*/
     printf("现在有%d个部门\r\n", manager.departments_LM.uxNumberOfItems);
     list_test = listGET_HEAD_ENTRY(&manager.departments_LM);
     department = listGET_LIST_ITEM_OWNER(list_test);
@@ -83,16 +85,33 @@ void platform_department_init(void)
    {
         printf("找到了%s\r\n", service->name);
    }
-    
+#endif
+    //在这里注册的是医生
    fscanf(message_f, "%d", &doctor_num);
    for(i=0;i<doctor_num;i++)
    {
         fscanf(message_f, "%s %s %s %s", id, name, passwd, work);
-        platfor_add_doctor(name, id, passwd, work);
+        platform_add_doctor(name, id, passwd, work);
    }
-
-
-    fclose(message_f);
+    //在这里注册病人
+    fscanf(message_f, "%d", &patient_num);
+   for(i=0;i<patient_num;i++)
+   {
+        fscanf(message_f, "%s %s %s %c %s", id, name, passwd, &status, work);
+        platform_add_patient(name, id, passwd, status ,work);
+   }
+#if DEBUG
+    patient_t *patient;
+    list_test = listGET_HEAD_ENTRY(&manager.patient_LM);
+    patient = listGET_LIST_ITEM_OWNER(list_test);
+    printf("一共有%d个病人\r\n", manager.patient_LM.uxNumberOfItems);
+    for(i=0;i<manager.patient_LM.uxNumberOfItems;i++)
+    {
+        printf("患者 %d 的名字是 %s 现在的状态是 %d\r\n", i+1, patient->login.name, patient->doctor_L.xItemValue);
+        list_test = listGET_NEXT(list_test);
+        patient = listGET_LIST_ITEM_OWNER(list_test);
+    }
+#endif
 
 }
 //从现有的部门里面获取某一个部门,参数是部门的名字
@@ -199,7 +218,9 @@ int32_t platform_login(int8_t *id, int8_t *passwd, int8_t choice)
 void platform_init()
 {
     platform_manage_init();
+#if DEBUG
     platform_test();
+#endif
 }
 //更新现在的数据,把数据写入到文件里面
 void platform_update(){
@@ -207,6 +228,7 @@ void platform_update(){
     one_department_t *department;
     outpatient_service_t *service;
     doctor_t *doctor;
+    patient_t *patient;
     FILE *message_f;
     message_f = fopen("document.txt", "w");
     ListItem_t *list_test2, *list_test;
@@ -240,7 +262,16 @@ void platform_update(){
         list_test = listGET_NEXT(list_test);
         doctor = listGET_LIST_ITEM_OWNER(list_test);
     }
-
+    //输入病人
+    list_test = listGET_HEAD_ENTRY(&manager.patient_LM);
+    patient = listGET_LIST_ITEM_OWNER(list_test);
+    fprintf(message_f, "%d\n", manager.patient_LM.uxNumberOfItems);
+    for(i=0;i<manager.patient_LM.uxNumberOfItems;i++)
+    {
+        fprintf(message_f, "%s %s %d %s %s\n", patient->login.id, patient->login.name, patient->doctor_L.xItemValue,patient->login.passwd,  patient->doc_id);
+        list_test = listGET_NEXT(list_test);
+        patient = listGET_LIST_ITEM_OWNER(list_test);
+    }  
     fclose(message_f);
 
 }

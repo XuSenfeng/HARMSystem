@@ -28,7 +28,7 @@ static doctor_t * platform_init_doctor(char *name, char *id, char *passwd , char
     if(service!=-1){
         vListInsertEnd(&service->doctors_LM, &doctor_to_init->service_L);
     }else{
-        printf("医生挂载部门失败...");
+        //printf("医生挂载部门失败...");
         while(1);
     }
     //挂载父节点
@@ -44,7 +44,7 @@ static doctor_t * platform_init_doctor(char *name, char *id, char *passwd , char
 
     return doctor_to_init;
 }
-doctor_t * platfor_add_doctor(char *name, char *id, char *passwd , char *work)
+doctor_t * platform_add_doctor(char *name, char *id, char *passwd , char *work)
 {
     int32_t i = listCURRENT_LIST_LENGTH(&manager.doctors_LM);
     int8_t flog = 0;
@@ -66,20 +66,20 @@ doctor_t * platfor_add_doctor(char *name, char *id, char *passwd , char *work)
         doctor = platform_init_doctor(name, id, passwd , work);
     }else
     {
-        printf("添加医生 %s 编号 %s 失败,请不要输入重复的编号的医生...\r\n", name, id);
+        //printf("添加医生 %s 编号 %s 失败,请不要输入重复的编号的医生...\r\n", name, id);
         return -1;
     }
     return doctor;
 }
 
-int32_t platform_get_doc(char *id)
+doctor_t *platform_get_doc(char *id)
 {
     doctor_t *doctor=NULL;
     ListItem_t *doc_list;
     int i, flog=0;
     doc_list = listGET_HEAD_ENTRY(&manager.doctors_LM);
     doctor = listGET_LIST_ITEM_OWNER(doc_list);
-    i = listGET_ITEM_VALUE_OF_HEAD_ENTRY(&manager.doctors_LM);
+    i = listCURRENT_LIST_LENGTH(&manager.doctors_LM);
     while(i--)
     {
         if(strcmp(doctor->login.id, id)==0)
@@ -92,9 +92,10 @@ int32_t platform_get_doc(char *id)
     }
     if(flog)
     {
+        //printf("医生%s找到了\r\n", doctor->login.name);
         return doctor;
     }else{
-        return NULL;
+        return -1;
     }
 }
 int32_t platform_get_patient(char *id)
@@ -128,14 +129,18 @@ int32_t platform_patient_appointment(patient_t *patient, char *doc_id)
     ListItem_t doc_list;
     int i;
     doctor = platform_get_doc(doc_id);
-    if(doctor!=NULL)
+    if(doctor!=-1)
     {
+#if DEBUG
         printf("已经预约到医生 %s \r\n", doctor->login.name);
+#endif
         vListInsertEnd(&doctor->patient_LM, &patient->doctor_L);
         patient->doctor_L.xItemValue = 1;
         return 1;
     }else{
+#if DEBUG
         printf("医生不存在\r\n");
+#endif
         return -1;
     }
 
@@ -209,20 +214,52 @@ patient_t * platform_init_patient(char *name, char *id, char *passwd)
     return patient_to_init;
 }
 
+void *platform_add_patient(int8_t *name, int8_t *id, int8_t *passwd, int8_t status, int8_t *doc_id)
+{
+    
+    doctor_t *doctor;
+    int32_t i = listCURRENT_LIST_LENGTH(&manager.patient_LM);
+    int8_t flog = 0;
+    ListItem_t *list_pantient = listGET_HEAD_ENTRY(&manager.patient_LM);
+    patient_t *patient = listGET_LIST_ITEM_OWNER(list_pantient);
+    while(i--)
+    {
+        //比较有没有添加过相同的人
+        if(strcmp(id, patient->login.id)==0)
+        {
+            flog=1;
+        }
+        list_pantient = listGET_NEXT(list_pantient);
+        patient = listGET_LIST_ITEM_OWNER(list_pantient);
+    }
+    if(flog==0)
+    {
+        patient = platform_init_patient(name, id, passwd);
+    }else
+    {
+        //printf("\r\n添加病人 %s 编号 %s 失败,请不要输入重复的编号的病人...\r\n", name, id);
+        return -1;
+    }
+    strcpy(patient->doc_id, doc_id);
+    doctor = platform_get_doc(doc_id);
+    if(doctor != -1)
+    {
+        if(status == '1')
+        {
+            vListInsertEnd(&doctor->patient_LM, &patient->doctor_L);
+            patient->doctor_L.xItemValue = 1;
+        }else if(status == '2'){
+            vListInsertEnd(&doctor->patient_LM, &patient->doctor_L);
+            patient->doctor_L.xItemValue = 2;
+        }
+    }
+    return patient;
+    
+}
+
 uint32_t platform_get_patient_status(patient_t *patient)
 {
     return patient->doctor_L.xItemValue;
 }
 
-void platform_get_patient_login_data(patient_t *patient_t, int8_t *message)
-{
-    uint32_t status;
-    status = platform_get_patient_status(patient_t);
-    sprintf(message, "尊敬的 %s 先生/女士\r\n", patient_t->login.name);
-    if(status == WITHOUT_APPLICATION)
-        sprintf(message, "%s您当前的预约状态是没有预约\r\n", message);
-    else if(status == FIRST_VISIT_DOCTOR)
-        sprintf(message, "%s您当前的预约状态是预约没有初诊\r\n", message);
-    else if(status == SUBSQUENT_VISIT)
-        sprintf(message, "%s您当前的预约状态是等待复诊\r\n", message);
-}
+

@@ -50,5 +50,6 @@ void app_patient_dealwith(base_data *login_data)
     printf("您好, 用户\r\n");
     platform_get_login_data(login_data->identity, data,login_data->id);
     printf("获取到: %s", data);
+    
     while(1);
 }
