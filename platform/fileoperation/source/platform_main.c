@@ -325,16 +325,3 @@ void platform_out()
     
 }
 
-void platform_get_login_data(int8_t choice, char *message, char *id)
-{
-    patient_t *patient;
-    if(choice == '1')
-    {
-
-        patient = platform_get_patient(id);
-        if(patient!=NULL)
-            platform_get_patient_login_data(patient, message);
-        else
-            sprintf(message, "ªÒ»° ß∞‹%s\r\n", id);
-    }
-}

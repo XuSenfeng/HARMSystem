@@ -9,4 +9,6 @@ patient_t * platform_init_patient(char *name, char *id, char *passwd);
 int32_t platform_patient_appointment(patient_t *patient, char *doc_id);
 uint32_t platform_get_patient_status(patient_t *patient);
 void platform_del_doctor(doctor_t *doctor);
+patient_t* platform_get_patient(char *id);
+doctor_t *platform_get_doc(char *id);
 #endif // !PLATFORM_UPDATE_H

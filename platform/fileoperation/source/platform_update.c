@@ -23,7 +23,7 @@ static doctor_t * platform_init_doctor(char *name, char *id, char *passwd , char
     vListInitialiseItem(&doctor_to_init->manage_L);
     vListInitialiseItem(&doctor_to_init->service_L);
     vListInsertEnd(&manager.doctors_LM, &doctor_to_init->manage_L);
-    printf("%s", work);
+    //printf("%s", work);
     service = platform_get_service(work);
     if(service!=-1){
         vListInsertEnd(&service->doctors_LM, &doctor_to_init->service_L);
@@ -44,6 +44,7 @@ static doctor_t * platform_init_doctor(char *name, char *id, char *passwd , char
 
     return doctor_to_init;
 }
+//添加一个医生
 doctor_t * platform_add_doctor(char *name, char *id, char *passwd , char *work)
 {
     int32_t i = listCURRENT_LIST_LENGTH(&manager.doctors_LM);
@@ -55,7 +56,7 @@ doctor_t * platform_add_doctor(char *name, char *id, char *passwd , char *work)
         
         if(strcmp(id, doctor->login.id)==0)
         {
-            printf("id = %s %s\r\n", id, doctor->login.id);
+            //printf("id = %s %s\r\n", id, doctor->login.id);
             flog=1;
         }
         list_doc = listGET_NEXT(list_doc);
@@ -71,7 +72,7 @@ doctor_t * platform_add_doctor(char *name, char *id, char *passwd , char *work)
     }
     return doctor;
 }
-
+//获取一个医生的结构体
 doctor_t *platform_get_doc(char *id)
 {
     doctor_t *doctor=NULL;
@@ -98,7 +99,8 @@ doctor_t *platform_get_doc(char *id)
         return -1;
     }
 }
-int32_t platform_get_patient(char *id)
+//获取一个病人的结构体
+patient_t* platform_get_patient(char *id)
 {
     patient_t *patient=NULL;
     ListItem_t *pat_list;
@@ -120,7 +122,7 @@ int32_t platform_get_patient(char *id)
     {
         return patient;
     }else{
-        return NULL;
+        return -1;
     }
 }
 int32_t platform_patient_appointment(patient_t *patient, char *doc_id)
@@ -129,6 +131,12 @@ int32_t platform_patient_appointment(patient_t *patient, char *doc_id)
     ListItem_t doc_list;
     int i;
     doctor = platform_get_doc(doc_id);
+    if(patient->doctor_L.xItemValue != 0)
+    {
+        uxListRemove(&patient->doctor_L);
+        patient->doctor_L.xItemValue = 0;
+    }
+
     if(doctor!=-1)
     {
 #if DEBUG
@@ -136,6 +144,7 @@ int32_t platform_patient_appointment(patient_t *patient, char *doc_id)
 #endif
         vListInsertEnd(&doctor->patient_LM, &patient->doctor_L);
         patient->doctor_L.xItemValue = 1;
+        strcpy(patient->doc_id, doc_id);
         return 1;
     }else{
 #if DEBUG

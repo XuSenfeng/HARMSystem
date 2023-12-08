@@ -3,7 +3,6 @@
 int main(void)
 {
     base_data login_data;
-    printf("main\r\n");
     //平台初始化
     platform_init();
     while(1)

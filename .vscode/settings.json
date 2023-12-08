@@ -5,6 +5,10 @@
         "platform_main.h": "c",
         "app_dispose.h": "c",
         "app_patient.h": "c",
-        "app_main.h": "c"
+        "app_main.h": "c",
+        "array": "c",
+        "string": "c",
+        "string_view": "c",
+        "system_error": "c"
     }
 }

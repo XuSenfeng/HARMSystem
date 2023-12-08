@@ -21,7 +21,7 @@ int8_t app_welcome(void)
     printf("*****************************************************************\r\n");
     printf("*                       欢迎使用医院管理系统                    *\r\n");
     printf("*                                         author:XvSenfeng      *\r\n");
-    printf("*                                          data:2023-12-7       *\r\n");
+    printf("*                                          date:2023-12-7       *\r\n");
     printf("*                               web:https://github.com/XuSenfeng*\r\n");
     printf("*****************************************************************\r\n");
     printf("请选择您的身份:\r\n");

@@ -69,5 +69,4 @@ void platform_init();
 void platform_out();
 int32_t platform_login(int8_t *id, int8_t *passwd, int8_t choice);
 outpatient_service_t * platform_get_service(char *name);
-void platform_get_login_data(int8_t choice, char *message, char *id);
 #endif /*PLATFORM_MAIN_H*/
