@@ -3,6 +3,8 @@
     "C_Cpp.errorSquiggles": "disabled",
     "files.associations": {
         "platform_main.h": "c",
-        "app_dispose.h": "c"
+        "app_dispose.h": "c",
+        "app_patient.h": "c",
+        "app_main.h": "c"
     }
 }

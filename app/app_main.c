@@ -1,17 +1,19 @@
 #include "app_main.h"
-#include "platform_main.h"
-#include <stdio.h>
+
 int main(void)
 {
-    uint8_t choice;
+    base_data login_data;
     printf("main\r\n");
     //平台初始化
     platform_init();
     while(1)
     {
-        choice = app_welcome();
-        if(choice != '0'){
-            app_login(choice);
+        login_data.identity = app_welcome();
+        if(login_data.identity != '0'){
+            if(app_login(&login_data)==1)
+            {
+                app_successed_login(&login_data);
+            }
             
         }else
         {

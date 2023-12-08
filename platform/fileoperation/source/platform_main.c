@@ -1,11 +1,10 @@
 
 #include "platform_main.h"
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+
 manager_t manager;
 void platform_test(void)
 {
+    uint32_t ret;
     ListItem_t * doctor_list, * patient_list;
     doctor_t * doctor;
     patient_t * patient;
@@ -14,10 +13,21 @@ void platform_test(void)
     doctor_list = listGET_HEAD_ENTRY(&manager.doctors_LM);
     doctor = (doctor_t *)listGET_LIST_ITEM_OWNER(doctor_list);
     printf("医生的信息: %s %s %s\r\n", doctor->login.id, doctor->login.name, doctor->login.passwd);
-    platform_init_patient("dong", "222", "123456");
+    platform_init_patient("张振辉", "222", "123456");
     patient_list = listGET_HEAD_ENTRY(&manager.patient_LM);
     patient = (patient_t *)listGET_LIST_ITEM_OWNER(patient_list);
     printf("患者的信息: %s %s %s\r\n", patient->login.id, patient->login.name, patient->login.passwd);
+    platform_patient_appointment(patient, "1001");
+    ret = platform_get_patient_status(patient);
+    if(ret==WITHOUT_APPLICATION)
+    {
+        printf("没有预约\r\n");
+    }
+    else if(ret = 1)
+    {
+        printf("预约成功\r\n");
+    }
+
 }
 
 void platform_department_init(void)
@@ -78,7 +88,7 @@ void platform_department_init(void)
    for(i=0;i<doctor_num;i++)
    {
         fscanf(message_f, "%s %s %s %s", id, name, passwd, work);
-        platform_init_doctor(name, id, passwd, work);
+        platfor_add_doctor(name, id, passwd, work);
    }
 
 
@@ -114,101 +124,6 @@ outpatient_service_t * platform_get_service(char *name)
 
 }
 
-
-
-void platform_manage_init()
-{
-    int i, j;
-    strcpy(manager.login.id, "000");
-    strcpy(manager.login.name, "manage");   
-    strcpy(manager.login.passwd, "123456");   
-    vListInitialise(&manager.doctors_LM);
-    vListInitialise(&manager.patient_LM);
-    vListInitialise(&manager.departments_LM);
-    platform_department_init();
-}
-//申请一个医生的的结构体,并挂载在管理者名下
-doctor_t * platform_init_doctor(char *name, char *id, char *passwd , char *work)
-{
-    outpatient_service_t * service;
-    doctor_t *doctor_to_init;
-    doctor_to_init = malloc(sizeof(doctor_t));
-    /**********************节点的初始化**************************/
-    //挂载在管理者名下
-    vListInitialiseItem(&doctor_to_init->manage_L);
-    vListInitialiseItem(&doctor_to_init->service_L);
-    vListInsertEnd(&manager.doctors_LM, &doctor_to_init->manage_L);
-    printf("%s", work);
-    service = platform_get_service(work);
-    if(service!=-1){
-        vListInsertEnd(&service->doctors_LM, &doctor_to_init->service_L);
-    }else{
-        printf("医生挂载部门失败...");
-        while(1);
-    }
-    //挂载父节点
-    listSET_LIST_ITEM_OWNER(&doctor_to_init->manage_L, doctor_to_init);
-    listSET_LIST_ITEM_OWNER(&doctor_to_init->service_L, doctor_to_init);
-    vListInitialise(&doctor_to_init->patient_LM);
-    /************************************************************/
-    //在这里初始化各种个人信息
-    strcpy(doctor_to_init->login.id, id);
-    strcpy(doctor_to_init->login.name, name);
-    strcpy(doctor_to_init->login.passwd, passwd);
-    strcpy(doctor_to_init->service, work);
-
-    return doctor_to_init;
-}
-
-//申请一个部门的的结构体,并挂载在管理者名下
-one_department_t * platform_init_department(char *name)
-{
-    one_department_t *department;
-    department = malloc(sizeof(one_department_t));
-    vListInitialise(&department->services_LM);
-    vListInitialiseItem(&department->manage_L);
-    vListInsertEnd(&manager.departments_LM, &department->manage_L);
-    //设置父节点
-    listSET_LIST_ITEM_OWNER(&department->manage_L, department);
-    strcpy(department->name, name);
-    return department;
-}
-
-//申请一个门诊的的结构体,并挂载在部门名下
-outpatient_service_t * platform_init_service(char *name, one_department_t* department)
-{
-    outpatient_service_t *service;
-    service = malloc(sizeof(outpatient_service_t));
-    vListInitialise(&service->doctors_LM);
-    vListInitialiseItem(&service->department_L);
-    //fscanf(message_f, "%s", service->name);
-    strcpy(service->name, name);
-    //把某一个科室注册到部门下面
-    vListInsertEnd(&department->services_LM, &service->department_L);
-    listSET_LIST_ITEM_OWNER(&service->department_L, service);
-    return service;
-}
-
-//申请一个患者的的结构体,并挂载在管理者名下
-patient_t * platform_init_patient(char *name, char *id, char *passwd)
-{
-    patient_t *patient_to_init;
-    patient_to_init = malloc(sizeof(patient_t));
-    /**********************节点的初始化**************************/
-    //挂载在管理者名下
-    vListInitialiseItem(&patient_to_init->manage_L);
-    vListInitialiseItem(&patient_to_init->doctor_L);
-    vListInsertEnd(&manager.patient_LM, &patient_to_init->manage_L);
-    //挂载父节点
-    patient_to_init->manage_L.pvOwner = (void *)patient_to_init;
-    /************************************************************/
-    //在这里初始化各种个人信息
-    strcpy(patient_to_init->login.id, id);
-    strcpy(patient_to_init->login.name, name);
-    strcpy(patient_to_init->login.passwd, passwd);
-    
-    return patient_to_init;
-}
 
 
 //根据一个人输入的信息判断是不是正确的
@@ -377,4 +292,18 @@ void platform_out()
         free(department);
     }
     
+}
+
+void platform_get_login_data(int8_t choice, char *message, char *id)
+{
+    patient_t *patient;
+    if(choice == '1')
+    {
+
+        patient = platform_get_patient(id);
+        if(patient!=NULL)
+            platform_get_patient_login_data(patient, message);
+        else
+            sprintf(message, "获取失败%s\r\n", id);
+    }
 }

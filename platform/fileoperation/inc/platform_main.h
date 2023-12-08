@@ -3,6 +3,15 @@
 #include "type.h"
 #include "list.h"
 #include "app_main.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+//ԤԼ״̬
+#define WITHOUT_APPLICATION             0
+#define FIRST_VISIT_DOCTOR              1
+#define SUBSQUENT_VISIT                 2
+
 typedef struct
 {
     int8_t id[21];
@@ -55,12 +64,7 @@ typedef struct{
 
 void platform_init();
 void platform_out();
-void platform_manage_init();
-doctor_t * platform_init_doctor(char *name, char *id, char *passwd , char *work);
 int32_t platform_login(int8_t *id, int8_t *passwd, int8_t choice);
-patient_t * platform_init_patient(char *name, char *id, char *passwd);
 outpatient_service_t * platform_get_service(char *name);
-one_department_t * platform_init_department(char *name);
-outpatient_service_t * platform_init_service(char *name, one_department_t* department);
-
+void platform_get_login_data(int8_t choice, char *message, char *id);
 #endif /*PLATFORM_MAIN_H*/

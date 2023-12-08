@@ -1,5 +1,4 @@
 #include "app_dispose.h"
-#include <stdio.h>
 
 int8_t app_get_choice()
 {
@@ -34,129 +33,29 @@ int8_t app_welcome(void)
     choice = app_get_choice();
     return choice;
 }
-//用户登录处理函数
-int32_t app_patient_login()
-{
-    int8_t choice, num=3;
-    int8_t id[21], passwd[31];
-    int32_t ret;
-    printf("请问您之前是否注册过用户?\r\n");
-    printf("1.是的 2.没有\r\n");
-    printf("您的选择是: ");
-    choice = app_get_choice();
-    if(choice == '1' )
-    {
-        while(1){
-            //之前存在用户
-            printf("请输入您的id: ");
-            fflush(stdin);
-            scanf("%s", id);
-            printf("请输入您的密码:");
-            fflush(stdin);
-            scanf("%s", passwd);
-            fflush(stdin);
-            ret = platform_login(id, passwd, '1');
-            if(ret == -1)
-            {
-                num--;
-                printf("id或者密码错误, 请重新输入 %s %s\r\n", id, passwd);
-                if(num==0)
-                {
-                    return -1;
-                }
-            }
-            else
-            {
-                return 1;
-            }
-        }
-    }else
-    {
-        //之前没有用户
 
-    }
-}
-//医生的登录函数,成功的话返回1,否则返回0
-int32_t app_doctor_login()
+
+
+void app_login(base_data *login_data)
 {
-    int8_t choice, num=3;
-    int8_t id[21], passwd[31];
-    int32_t ret;
-    while(1){
-        //之前存在用户
-        printf("请输入您的id: ");
-        fflush(stdin);
-        scanf("%s", id);
-        printf("请输入您的密码:");
-        fflush(stdin);
-        scanf("%s", passwd);
-        fflush(stdin);
-        ret = platform_login(id, passwd, '2');
-        if(ret == -1)
-        {
-            num--;
-            printf("id或者密码错误, 请重新输入");
-            if(num==0)
-            {
-                return -1;
-            }
-        }
-        else
-        {
-            return 1;
-        }
-    }
-}
-int32_t app_manage_login()
-{
-    int8_t choice, num=3;
-    int8_t id[21], passwd[31];
-    int32_t ret;
-    while(1){
-        //之前存在用户
-        printf("请输入您的id: ");
-        fflush(stdin);
-        scanf("%s", id);
-        printf("请输入您的密码:");
-        fflush(stdin);
-        scanf("%s", passwd);
-        fflush(stdin);
-        ret = platform_login(id, passwd, '3');
-        if(ret == -1)
-        {
-            num--;
-            printf("id或者密码错误, 请重新输入");
-            if(num==0)
-            {
-                return -1;
-            }
-        }
-        else
-        {
-            return 1;
-        }
-    }
-}
-void app_login(int8_t choice)
-{
-    uint8_t ret;
-    printf("您的选择是: %c\r\n", choice);
-    switch (choice)
+    
+    printf("您的选择是: %c\r\n", login_data->identity);
+    switch (login_data->identity)
     {
     case '1':
-        if(app_patient_login())
+        if(app_patient_login(login_data))
         {
 
         }
         break;
     case '2':
-        if(app_doctor_login())
+        if(app_doctor_login(login_data))
         {
 
         }
         break;
     case '3':
-        if(app_manage_login()){
+        if(app_manage_login(login_data)){
 
         }
         break;
@@ -165,3 +64,23 @@ void app_login(int8_t choice)
         break;
     }
 }
+
+void app_successed_login(base_data *login_data)
+{
+    printf("登录成功!!! %c\r\n", login_data->identity);
+    switch (login_data->identity)
+    {
+    case '1':
+        app_patient_dealwith(login_data);
+        break;
+    case '2':
+        app_doctor_dealwith(login_data);
+        break;
+    case '3':
+        app_manage_dealwith(login_data);
+        break;  
+    default:
+        break;
+    }
+}
+
