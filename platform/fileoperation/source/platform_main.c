@@ -41,7 +41,7 @@ void platform_department_init(void)
     int8_t name[21];
     //医生初始化
     int32_t doctor_num;
-    int8_t id[21], passwd[30], work[20], status; 
+    int8_t id[21], passwd[30], work[20], status, level[30]; 
 
     message_f = fopen("document.txt", "r");
     fscanf(message_f, "%d", &management_num);
@@ -90,8 +90,8 @@ void platform_department_init(void)
    fscanf(message_f, "%d", &doctor_num);
    for(i=0;i<doctor_num;i++)
    {
-        fscanf(message_f, "%s %s %s %s", id, name, passwd, work);
-        platform_add_doctor(name, id, passwd, work);
+        fscanf(message_f, "%s %s %s %s %s %d", id, name, passwd, work, level, &management_num);
+        platform_add_doctor(name, id, passwd, work, level, management_num);
    }
     //在这里注册病人
     fscanf(message_f, "%d", &patient_num);
@@ -258,7 +258,7 @@ void platform_update(){
     fprintf(message_f, "%d\n", manager.doctors_LM.uxNumberOfItems);
     for(i=0;i<manager.doctors_LM.uxNumberOfItems;i++)
     {
-        fprintf(message_f, "%s %s %s %s\n", doctor->login.id, doctor->login.name, doctor->login.passwd, doctor->service);
+        fprintf(message_f, "%s %s %s %s %s %d\n", doctor->login.id, doctor->login.name, doctor->login.passwd, doctor->service, doctor->level, doctor->num_to_accept);
         list_test = listGET_NEXT(list_test);
         doctor = listGET_LIST_ITEM_OWNER(list_test);
     }
@@ -268,7 +268,7 @@ void platform_update(){
     fprintf(message_f, "%d\n", manager.patient_LM.uxNumberOfItems);
     for(i=0;i<manager.patient_LM.uxNumberOfItems;i++)
     {
-        fprintf(message_f, "%s %s %d %s %s\n", patient->login.id, patient->login.name, patient->doctor_L.xItemValue,patient->login.passwd,  patient->doc_id);
+        fprintf(message_f, "%s %s %s %d %s\n", patient->login.id, patient->login.name, patient->login.passwd, patient->doctor_L.xItemValue,  patient->doc_id);
         list_test = listGET_NEXT(list_test);
         patient = listGET_LIST_ITEM_OWNER(list_test);
     }  

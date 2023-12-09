@@ -1,7 +1,7 @@
 #include "platform_patient.h"
 extern manager_t manager;
 
-platform_patient_getdoc_data_d(int8_t *message, int32_t begin, int32_t num){
+void platform_patient_getdoc_data_d(int8_t *message, int32_t begin, int32_t num){
     one_department_t *department;
     outpatient_service_t *service;
     doctor_t *doctor;
@@ -29,7 +29,7 @@ platform_patient_getdoc_data_d(int8_t *message, int32_t begin, int32_t num){
             for(t=0;t<service->doctors_LM.uxNumberOfItems;t++)
             {
                 if(k>=begin && k<begin + num)
-                    sprintf(message, "%s\t\t医生 %s 的id是 %s\r\n", message, doctor->login.id, doctor->login.name);
+                    sprintf(message, "%s\t\t医生 %s 的id是 %s  %s\r\n", message, doctor->login.id, doctor->login.name, doctor->level);
                 list_test3 = listGET_NEXT(list_test3);
                 doctor = listGET_LIST_ITEM_OWNER(list_test3);
             }
@@ -47,6 +47,34 @@ platform_patient_getdoc_data_d(int8_t *message, int32_t begin, int32_t num){
 
 }
 
+void platform_patient_getdoc_data_L(int8_t *message, int32_t begin, int32_t num){
+
+    doctor_t *doctor;
+    outpatient_service_t *service;
+    int32_t i, k=0, j, t;
+    ListItem_t *list_test, *list_test2, *list_test3;
+    //清空缓冲区
+    sprintf(message, "\0");
+    /*测试代码, 会显示现在已经注册的所有的部门以及门诊*/
+    list_test = listGET_HEAD_ENTRY(&manager.doctors_LM);
+    doctor = listGET_LIST_ITEM_OWNER(list_test);
+    for(i=0;i<manager.doctors_LM.uxNumberOfItems;i++)
+    {
+        
+        if(k>=begin && k<begin + num)
+            sprintf(message, "%s%s %s 医生职位是 %s 预约id是 %s 还可以接待%d个人\r\n", 
+            message, doctor->level,
+            doctor->login.name, doctor->service, 
+            doctor->login.id, doctor->num_to_accept - doctor->patient_LM.uxNumberOfItems);
+        k++;
+        list_test = listGET_NEXT(list_test);
+        doctor = listGET_LIST_ITEM_OWNER(list_test);
+
+    }
+
+}
+
+
 //这个是用户的平台接口,根据命令返回信息
 void platform_patient_commend(int8_t commend, char *id, char *message, void *parameter)
 {
@@ -54,7 +82,10 @@ void platform_patient_commend(int8_t commend, char *id, char *message, void *par
     int32_t ret;
     patient = platform_get_patient(id);
     int32_t *p;
-    if(patient != -1)
+    int8_t (*p_8)[30];
+    int8_t id_n[21];
+
+    if(patient != -1 || strlen(id)==0)
     {
         switch (commend)
         {
@@ -80,6 +111,28 @@ void platform_patient_commend(int8_t commend, char *id, char *message, void *par
         case 4:
             p = parameter;
             platform_patient_getdoc_data_d(message, *p, *(p+1));
+            break;
+        case 5:
+            p_8 = parameter;
+            sprintf(message, "");
+            sprintf(id_n,"1%03d", manager.patient_LM.uxNumberOfItems+1);
+            //printf("您输入的密码 %s , 用户名 %s, id %s\r\n", *p_8, *(p_8+1), id_n);
+            patient = platform_add_patient(*p_8, id_n, *(p_8+1), '0', "0");
+            if(patient==-1)
+            {
+                sprintf(message, "获取用户失败,原因是生成的id重复,请检查后台的数据\r\n");
+            }else
+            {
+                sprintf(message, "用户 %s 申请成功, 您的id是 %s 请记牢作为登录凭证\r\n", patient->login.name, patient->login.id);
+                //保存用户信息
+                strcpy(id, patient->login.id);
+                sprintf(message, "%s您当前的密码是 %s\r\n",message,  *(p_8+1));
+            }
+            break;
+        case 6:
+            p = parameter;
+            platform_patient_getdoc_data_L(message, *p, *(p+1));
+            break;
         default:
             break;
         }

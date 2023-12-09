@@ -84,3 +84,22 @@ void app_successed_login(base_data *login_data)
     }
 }
 
+void app_get_passwd(char *password)
+{
+    int i = 0; //记录密码长度
+    char c; //用于实现密码隐式输入
+    while (1) {
+    c = _getch(); //用 _getch() 函数输入，字符不会显示在屏幕上
+    if (c == '\r') { //遇到回车，表明密码输入结束
+        break; //while 循环的出口
+    }
+    else if (c == '\b') { //遇到退格，需要删除前一个星号
+        printf("\b \b");  //退格，打一个空格，再退格，实质上是用空格覆盖掉星号
+        --i;
+    }
+    else {
+        password[i++] = c;//将字符放入数组
+        printf("*");     
+    }
+}
+}

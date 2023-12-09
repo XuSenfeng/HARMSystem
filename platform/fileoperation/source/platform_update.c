@@ -13,20 +13,43 @@ void platform_manage_init()
 }
 
 //申请一个医生的的结构体,并挂载在管理者名下
-static doctor_t * platform_init_doctor(char *name, char *id, char *passwd , char *work)
+static doctor_t * platform_init_doctor(char *name, char *id, char *passwd , char *work, char *level)
 {
     outpatient_service_t * service;
     doctor_t *doctor_to_init;
     doctor_to_init = malloc(sizeof(doctor_t));
+
+    //根据职称设置官职
+    if(strcmp(level, DOC_LEVE_1)==0)
+    {
+        doctor_to_init->manage_L.xItemValue = 1;
+    }
+    if(strcmp(level, DOC_LEVE_2)==0)
+    {
+        doctor_to_init->manage_L.xItemValue = 2;
+    }
+    if(strcmp(level, DOC_LEVE_3)==0)
+    {
+        doctor_to_init->manage_L.xItemValue = 3;
+    }
+    if(strcmp(level, DOC_LEVE_4)==0)
+    {
+        doctor_to_init->manage_L.xItemValue = 4;
+    }
+    if(strcmp(level, DOC_LEVE_5)==0)
+    {
+        doctor_to_init->manage_L.xItemValue = 5;
+    }
+
     /**********************节点的初始化**************************/
     //挂载在管理者名下
     vListInitialiseItem(&doctor_to_init->manage_L);
     vListInitialiseItem(&doctor_to_init->service_L);
-    vListInsertEnd(&manager.doctors_LM, &doctor_to_init->manage_L);
+    vListInsert(&manager.doctors_LM, &doctor_to_init->manage_L);
     //printf("%s", work);
     service = platform_get_service(work);
     if(service!=-1){
-        vListInsertEnd(&service->doctors_LM, &doctor_to_init->service_L);
+        vListInsert(&service->doctors_LM, &doctor_to_init->service_L);
     }else{
         //printf("医生挂载部门失败...");
         while(1);
@@ -45,7 +68,7 @@ static doctor_t * platform_init_doctor(char *name, char *id, char *passwd , char
     return doctor_to_init;
 }
 //添加一个医生
-doctor_t * platform_add_doctor(char *name, char *id, char *passwd , char *work)
+doctor_t * platform_add_doctor(char *name, char *id, char *passwd , char *work, char *level, int32_t num_to_acp)
 {
     int32_t i = listCURRENT_LIST_LENGTH(&manager.doctors_LM);
     int8_t flog = 0;
@@ -64,12 +87,14 @@ doctor_t * platform_add_doctor(char *name, char *id, char *passwd , char *work)
     }
     if(flog==0)
     {
-        doctor = platform_init_doctor(name, id, passwd , work);
+        doctor = platform_init_doctor(name, id, passwd , work, level);
     }else
     {
         //printf("添加医生 %s 编号 %s 失败,请不要输入重复的编号的医生...\r\n", name, id);
         return -1;
     }
+    strcpy(doctor->level, level);
+    doctor->num_to_accept = num_to_acp;
     return doctor;
 }
 //获取一个医生的结构体
@@ -222,7 +247,7 @@ patient_t * platform_init_patient(char *name, char *id, char *passwd)
 
     return patient_to_init;
 }
-
+//添加一个病人,参数一:名字, 参数二: id, 参数3: 当前状态'0'没有预约, '1'预约没有初诊, '2'等待复诊, 参数四,医生的id
 void *platform_add_patient(int8_t *name, int8_t *id, int8_t *passwd, int8_t status, int8_t *doc_id)
 {
     

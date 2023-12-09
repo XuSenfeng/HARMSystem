@@ -12,6 +12,16 @@
 #define FIRST_VISIT_DOCTOR              1
 #define SUBSQUENT_VISIT                 2
 
+/*知名专家、主任医师、副主任医师、主治医师和医师。*/
+#define DOC_LEVE_1              "知名专家"
+#define DOC_LEVE_2              "主任医师"
+#define DOC_LEVE_3              "副主任医师"
+#define DOC_LEVE_4              "主治医师"
+#define DOC_LEVE_5              "医师"
+
+
+
+
 //测试代码开关
 #define DEBUG                           0
 typedef struct
@@ -54,7 +64,9 @@ typedef struct
     ListItem_t manage_L;    //他自己的管理节点
     ListItem_t service_L;
     List_t patient_LM;       //管理他的所有病人的管理节点
-    char service[21];
+    int8_t service[21];
+    int8_t level[30];
+    int32_t num_to_accept;
 }doctor_t;
 
 //病人的对象

@@ -4,8 +4,9 @@
 int32_t app_patient_login(base_data *login_data)
 {
     int8_t choice, num=3;
-
     int32_t ret;
+    int8_t message[200];
+    int8_t parameter[3][30];
     printf("请问您之前是否注册过用户?\r\n");
     printf("1.是的 2.没有\r\n");
     printf("您的选择是: ");
@@ -36,10 +37,31 @@ int32_t app_patient_login(base_data *login_data)
                 return 1;
             }
         }
-    }else
+    }else if(choice == '2')
     {
         //之前没有用户
+        printf("*******************\r\n");
+        printf("*    用户注册     *\r\n");
+        printf("*******************\r\n");
+        printf("请输入您的真实姓名: \r\n");
+        fflush(stdin);
+        scanf("%s", parameter[0]);
+        fflush(stdin);
+        printf("请输入您的密码: ");
+        app_get_passwd(parameter[1]);
+        //printf("输入的密码是: %s\r\n", parameter[1]);
+        //归零数组
+        login_data->id[0] = 0;
+        platform_patient_commend(COMMEND_PAT_APLY_NEW_PAT, login_data->id, message, parameter);
+        printf(message);
+        system("pause");
+        system("cls");
 
+    }else
+    {
+        printf("\r\n输入有误返回上一级\r\n");
+        system("pause");
+        system("cls");
     }
 }
 //功能1: 显示所有医生的信息
@@ -55,7 +77,8 @@ void app_patient_get_doc_msg(base_data *login_data)
     system("CLS");
     printf("请选择观看模式\r\n");
     printf("1. 根据部门显示医生\r\n");
-    printf("2. 显示某一个部门所有医生\r\n");
+    printf("2. 按照职称显示所有医生\r\n");
+    printf("请输入您的选择: ");
     choice = app_get_choice();
     switch (choice)
     {
@@ -63,6 +86,7 @@ void app_patient_get_doc_msg(base_data *login_data)
         times = n/MESSAGE_STEP;
         left = n%MESSAGE_STEP;
         for(i=0;i<=times;i++){
+            //循环打印每一个部门的信息
             parameter[0] = i*MESSAGE_STEP;
             if(i==times)
             {
@@ -83,8 +107,34 @@ void app_patient_get_doc_msg(base_data *login_data)
             
             system("CLS");
         }
-
         break;
+        case '2':
+        times = n/MESSAGE_STEP_L;
+        left = n%MESSAGE_STEP_L;
+        for(i=0;i<=times;i++){
+            //循环打印每一个部门的信息
+            parameter[0] = i*MESSAGE_STEP_L;
+            if(i==times)
+            {
+                if(left != 0){
+                    parameter[1] = left;
+                }else
+                    break;
+            }else
+                parameter[1] = MESSAGE_STEP_L;
+            platform_patient_commend(COMMEND_PAT_GET_DOC_DTA_L, login_data->id, data, parameter);
+            printf(data);
+            printf("\r\n 输入u向上翻页 \r\n");
+            page_s = getch();
+            if(page_s=='u')
+                i-=2;
+            if(i<-1)
+                i=-1;
+            
+            system("CLS");
+        }
+        break;
+
     
     default:
         break;
