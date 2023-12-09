@@ -9,9 +9,18 @@ void platform_manage_init()
     vListInitialise(&manager.doctors_LM);
     vListInitialise(&manager.patient_LM);
     vListInitialise(&manager.departments_LM);
+    platform_add_patient("manager", "000", "123456", '0', "0");
     platform_department_init();
 }
-
+void platform_manage_out()
+{
+    patient_t *patient;
+    patient = platform_get_patient("000");
+    if(patient!=-1)
+    platform_del_patient(patient);
+    else
+    printf("删除管理员病人失败");
+}
 //申请一个医生的的结构体,并挂载在管理者名下
 static doctor_t * platform_init_doctor(char *name, char *id, char *passwd , char *work, char *level)
 {
@@ -194,8 +203,17 @@ void platform_del_doctor(doctor_t *doctor)
         list->xItemValue=0;
         uxListRemove(list);
     }
+    free(doctor);
 }
-
+//删除一个病人
+void platform_del_patient(patient_t *patient)
+{
+    ListItem_t *list;
+    if(patient->doctor_L.pvContainer!=NULL)
+        uxListRemove(&patient->doctor_L);
+    uxListRemove(&patient->manage_L);
+    free(patient);
+}
 //申请一个部门的的结构体,并挂载在管理者名下
 one_department_t * platform_init_department(char *name)
 {
@@ -239,6 +257,8 @@ patient_t * platform_init_patient(char *name, char *id, char *passwd)
     patient_to_init->manage_L.pvOwner = (void *)patient_to_init;
     /************************************************************/
     //在这里初始化各种个人信息
+    listSET_LIST_ITEM_OWNER(&patient_to_init->doctor_L, patient_to_init);
+    listSET_LIST_ITEM_OWNER(&patient_to_init->manage_L, patient_to_init);
     strcpy(patient_to_init->login.id, id);
     strcpy(patient_to_init->login.name, name);
     strcpy(patient_to_init->login.passwd, passwd);

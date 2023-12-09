@@ -284,6 +284,7 @@ void platform_out()
     ListItem_t *list_now, *list_next;
     doctor_t *doctor;
     patient_t *patient;
+    platform_manage_out();
     //把当前的数据存储起来
     platform_update();
     //释放内存

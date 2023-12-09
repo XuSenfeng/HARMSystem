@@ -12,5 +12,5 @@ void platform_del_doctor(doctor_t *doctor);
 patient_t* platform_get_patient(char *id);
 doctor_t *platform_get_doc(char *id);
 void *platform_add_patient(int8_t *name, int8_t *id, int8_t *passwd, int8_t status, int8_t *doc_id);
-
+void platform_manage_out();
 #endif // !PLATFORM_UPDATE_H
