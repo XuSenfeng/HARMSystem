@@ -66,6 +66,7 @@ typedef struct
     List_t patient_LM;       //管理他的所有病人的管理节点
     int8_t service[21];
     int8_t level[30];
+    int8_t workday[15];
     int32_t num_to_accept;
 }doctor_t;
 
@@ -81,4 +82,5 @@ void platform_init();
 void platform_out();
 int32_t platform_login(int8_t *id, int8_t *passwd, int8_t choice);
 outpatient_service_t * platform_get_service(char *name);
+void platform_department_init(int8_t *file_name);
 #endif /*PLATFORM_MAIN_H*/

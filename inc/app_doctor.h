@@ -5,6 +5,8 @@
 #define COMMEND_DOC_GET_SELF_DATA           1
 #define COMMEND_DOC_GET_PAT_NUM             2
 #define COMMEND_PAT_GET_DOC_DTA_D           3
+#define COMMEND_PAT_GET_DOC_FIRST_PAT       4
+#define COMMEND_PAT_DEAL_FST_PAT            5
 
 
 #define MESSAGE_STEP                       5

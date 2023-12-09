@@ -10,7 +10,7 @@ void platform_manage_init()
     vListInitialise(&manager.patient_LM);
     vListInitialise(&manager.departments_LM);
     platform_add_patient("manager", "000", "123456", '0', "0");
-    platform_department_init();
+    platform_department_init("document.txt");
 }
 void platform_manage_out()
 {
@@ -77,7 +77,7 @@ static doctor_t * platform_init_doctor(char *name, char *id, char *passwd , char
     return doctor_to_init;
 }
 //添加一个医生
-doctor_t * platform_add_doctor(char *name, char *id, char *passwd , char *work, char *level, int32_t num_to_acp)
+doctor_t * platform_add_doctor(char *name, char *id, char *passwd , char *work, char *level, int32_t num_to_acp, int8_t *workday)
 {
     int32_t i = listCURRENT_LIST_LENGTH(&manager.doctors_LM);
     int8_t flog = 0;
@@ -102,6 +102,7 @@ doctor_t * platform_add_doctor(char *name, char *id, char *passwd , char *work, 
         //printf("添加医生 %s 编号 %s 失败,请不要输入重复的编号的医生...\r\n", name, id);
         return -1;
     }
+    strcpy(doctor->workday, workday);
     strcpy(doctor->level, level);
     doctor->num_to_accept = num_to_acp;
     return doctor;
@@ -315,5 +316,25 @@ uint32_t platform_get_patient_status(patient_t *patient)
 {
     return patient->doctor_L.xItemValue;
 }
+//对病人进行就诊,参数,医生, 对应的病人, 以及'1':等待复诊, '2': 结束治疗
+void platform_doc_deal_pat(doctor_t *doctor, patient_t *patient, int8_t choice)
+{
+    if(choice == '1')
+    {
+        //病人需要进一步治疗
+        patient->doctor_L.xItemValue = 2;
+        //把他放到队尾
+        uxListRemove(&patient->doctor_L);
+        vListInsertEnd(&doctor->patient_LM, &patient->doctor_L);
+
+    }else if(choice == '2')
+    {
+        patient->doctor_L.xItemValue = 0;
+        //设置病人存储的医生为0
+        patient->doc_id[0] = '0';
+        patient->doc_id[1] = '\0';
+        uxListRemove(&patient->doctor_L);
+    }
 
 
+}

@@ -18,6 +18,7 @@ int8_t app_get_choice()
 int8_t app_welcome(void)
 {
     int8_t choice;
+    system("CLS");
     printf("*****************************************************************\r\n");
     printf("*                       欢迎使用医院管理系统                    *\r\n");
     printf("*                                         author:XvSenfeng      *\r\n");

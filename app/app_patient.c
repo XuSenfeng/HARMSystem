@@ -20,13 +20,13 @@ int32_t app_patient_login(base_data *login_data)
             scanf("%s", login_data->id);
             printf("ÇëÊäÈëÄúµÄÃÜÂë:");
             fflush(stdin);
-            scanf("%s", login_data->passwd);
+            app_get_passwd(login_data->passwd);
             fflush(stdin);
             ret = platform_login(login_data->id, login_data->passwd, '1');
             if(ret == -1)
             {
                 num--;
-                printf("id»òÕßÃÜÂë´íÎó, ÇëÖØĞÂÊäÈë %s %s\r\n", login_data->id, login_data->passwd);
+                printf("\r\nid»òÕßÃÜÂë´íÎó, ÇëÖØĞÂÊäÈë %s %s\r\n", login_data->id, login_data->passwd);
                 if(num==0)
                 {
                     return -1;

@@ -30,7 +30,7 @@ void platform_test(void)
 
 }
 //对文件进行读操作
-void platform_department_init(void)
+void platform_department_init(int8_t *file_name)
 {
     //部门初始化
     FILE *message_f;
@@ -42,8 +42,8 @@ void platform_department_init(void)
     //医生初始化
     int32_t doctor_num;
     int8_t id[21], passwd[30], work[20], status, level[30]; 
-
-    message_f = fopen("document.txt", "r");
+    int8_t workday[15];
+    message_f = fopen(file_name, "r");
     fscanf(message_f, "%d", &management_num);
     //printf("*******部门初始化*****%d\r\n", management_num);
     for(i=0;i<management_num;i++)
@@ -90,8 +90,8 @@ void platform_department_init(void)
    fscanf(message_f, "%d", &doctor_num);
    for(i=0;i<doctor_num;i++)
    {
-        fscanf(message_f, "%s %s %s %s %s %d", id, name, passwd, work, level, &management_num);
-        platform_add_doctor(name, id, passwd, work, level, management_num);
+        fscanf(message_f, "%s %s %s %s %s %d %s", id, name, passwd, work, level, &management_num, workday);
+        platform_add_doctor(name, id, passwd, work, level, management_num, workday);
    }
     //在这里注册病人
     fscanf(message_f, "%d", &patient_num);
@@ -258,7 +258,7 @@ void platform_update(){
     fprintf(message_f, "%d\n", manager.doctors_LM.uxNumberOfItems);
     for(i=0;i<manager.doctors_LM.uxNumberOfItems;i++)
     {
-        fprintf(message_f, "%s %s %s %s %s %d\n", doctor->login.id, doctor->login.name, doctor->login.passwd, doctor->service, doctor->level, doctor->num_to_accept);
+        fprintf(message_f, "%s %s %s %s %s %d %s\n", doctor->login.id, doctor->login.name, doctor->login.passwd, doctor->service, doctor->level, doctor->num_to_accept, doctor->workday);
         list_test = listGET_NEXT(list_test);
         doctor = listGET_LIST_ITEM_OWNER(list_test);
     }
