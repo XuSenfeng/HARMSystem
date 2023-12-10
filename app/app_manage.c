@@ -125,9 +125,40 @@ void app_manage_amend_doctor(base_data *login_data, int8_t *message)
             printf("4. 部门\r\n");
             printf("请输入您的选择: ");
             doc_msg[1][0] = app_get_choice();
-            printf("请输入修改以后的值: ");
-            scanf("%s", doc_msg[2]);
-            printf("\r\n测试%s\r\n, ", doc_msg[0]);
+            if(choice == '1' && choice == '2' && choice == '3'){
+                printf("请输入修改以后的值: ");
+                scanf("%s", doc_msg[2]);
+            }else{
+                printf("请选择现在他的职称\r\n");
+                printf("1. %s\r\n", DOC_LEVE_1);
+                printf("2. %s\r\n", DOC_LEVE_2);
+                printf("3. %s\r\n", DOC_LEVE_3);
+                printf("4. %s\r\n", DOC_LEVE_4);
+                printf("5. %s\r\n", DOC_LEVE_5);
+                printf("请输入你的选择: ");
+                choice = app_get_choice();
+                if(choice == '1')
+                {
+                    strcpy(doc_msg[2], DOC_LEVE_1);
+                }else if(choice == '2')
+                {
+                    strcpy(doc_msg[2], DOC_LEVE_2); 
+                }else if(choice == '3')
+                {
+                    strcpy(doc_msg[2], DOC_LEVE_3);
+                }else if(choice == '4')
+                {
+                    strcpy(doc_msg[2], DOC_LEVE_4);
+                }else if(choice == '5')
+                {
+                    strcpy(doc_msg[2], DOC_LEVE_5);
+                }else {
+                    printf("输入有误!!\r\n");
+                    system("pause");
+                    return;
+                }
+            }
+
             platform_manage_commend(COMMEND_MAN_CHG_DOC_BY_id, message, doc_msg);
             printf(message);
             system("pause");
@@ -168,6 +199,117 @@ void app_manage_add_msg_file(base_data *login_data, int8_t *message)
     }
     
 }
+
+void app_manage_add_doctor(base_data *login_data, int8_t *message)
+{
+    int8_t choice;
+    int8_t doc_msg[6][31];
+    system("CLS");
+    printf("现在你可以添加一个医生\r\n");
+    printf("请务必输入正确的信息否则程序会死机或者崩溃!!!\r\n");
+    printf("1. 确定\r\n");
+    printf("2. 取消\r\n");
+    printf("请输入您的选择: ");
+    choice = app_get_choice();
+    if(choice == '1')
+    {
+        printf("请输入医生的名字: ");
+        scanf("%s", doc_msg[0]);
+        printf("请输入医生的部门: ");
+        scanf("%s", doc_msg[1]);
+        printf("请输入医生的职称: ");
+        scanf("%s", doc_msg[2]);
+        printf("请输入医生的密码: ");
+        scanf("%s", doc_msg[3]);
+        printf("请输入医生的工作日(十四位代表一周的上下午1.工作 0.休息): ");
+        scanf("%s", doc_msg[4]);
+        printf("请输入医生的最大接诊数量: ");
+        scanf("%d", &doc_msg[5][0]);
+        
+        platform_manage_commend(COMMEND_MAN_ADD_NEW_DOC, message, doc_msg);
+        printf(message);
+        system("pause");
+    }else
+    {
+        printf("退出\r\n");
+        system("pause");
+    }
+}
+
+void app_manage_del_patient(base_data *login_data, int8_t *message)
+{
+    int8_t choice;
+    int8_t pat_id[31];
+    system("CLS");
+    printf("现在你可以选择删除一个病人\r\n");
+    printf("1. 确定\r\n");
+    printf("2. 取消\r\n");
+    printf("请输入您的选择: ");
+    choice = app_get_choice();
+    if(choice == '1')
+    {
+        printf("请输入您想要删除的病人的id: ");
+        scanf("%s", pat_id);
+        platform_manage_commend(COMMEND_MAN_GET_ONE_PAT, message, pat_id);
+        printf(message);
+        if(pat_id[0]!=0)
+        {
+            printf("1. 确定\r\n");
+            printf("2. 取消\r\n");
+            choice = app_get_choice();
+            if(choice == '1')
+            {
+                platform_manage_commend(COMMEND_MAN_DEL_PAT_BY_id, message, pat_id);
+                printf(message);
+                system("pause");
+            }
+        }else{
+            system("pause");
+        }
+
+    }else{
+        printf("退出\r\n");
+        system("pause");
+    }
+}
+
+void app_manage_amend_pat(base_data *login_data, int8_t *message)
+{
+    //信息数组1: id, 2:选择 3:改以后的值
+    int8_t pat_msg[3][31], choice;
+    system("CLS");
+    printf("请输入您想要更改的病人的id: ");
+    scanf("%s", pat_msg[0]);
+    printf("请您确定您要修改这一位病人:\r\n");
+    platform_manage_commend(COMMEND_MAN_GET_ONE_PAT, message, pat_msg[0]);
+    printf(message);
+    if(pat_msg[0][0]!=0)
+    {
+        printf("1. 确定\r\n");
+        printf("2. 取消\r\n");
+        printf("请输入您的选择: ");
+        choice = app_get_choice();
+        if(choice == '1')
+        {
+            printf("您想修改医生的信息的哪一部分?\r\n");
+            printf("1. 名字\r\n");
+            printf("2. 登录密码\r\n");
+            printf("请输入您的选择: ");
+            pat_msg[1][0] = app_get_choice();
+            if(choice == '1' && choice == '2'){
+                printf("请输入修改以后的值: ");
+                scanf("%s", pat_msg[2]);
+            }
+
+            platform_manage_commend(COMMEND_MAN_CHG_DOC_BY_id, message, pat_msg);
+            printf(message);
+            system("pause");
+        }
+    }else{
+        system("pause");
+    }
+}
+
 
 //总的处理函数
 void app_manage_dealwith(base_data *login_data)
@@ -211,10 +353,13 @@ void app_manage_dealwith(base_data *login_data)
             app_manage_amend_doctor(login_data, data);
             break;
         case '5':
+            app_manage_add_doctor(login_data, data);
             break;
         case '6':
+            app_manage_del_patient(login_data, data);
             break;
         case '7':
+            app_manage_amend_pat(login_data, data);
             break;
         case '8':
             app_manage_add_msg_file(login_data, data);

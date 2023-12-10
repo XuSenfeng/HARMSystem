@@ -77,7 +77,7 @@ static doctor_t * platform_init_doctor(char *name, char *id, char *passwd , char
     return doctor_to_init;
 }
 //添加一个医生
-doctor_t * platform_add_doctor(char *name, char *id, char *passwd , char *work, char *level, int32_t num_to_acp, int8_t *workday)
+doctor_t * platform_add_doctor(int8_t *name, int8_t *id, int8_t *passwd , int8_t *work, int8_t *level, int32_t num_to_acp, int8_t *workday)
 {
     int32_t i = listCURRENT_LIST_LENGTH(&manager.doctors_LM);
     int8_t flog = 0;

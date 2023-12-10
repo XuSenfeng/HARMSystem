@@ -29,7 +29,7 @@ void platform_manage_getpat_data(int8_t *message, int32_t begin, int32_t num){
         status = patient->doctor_L.xItemValue;
         if(k>=begin && k<begin + num){
             sprintf(message, "%s病人 %d 号的id是: %s 名字: %s 当前的状态是 %s\r\n", 
-            message, k, patient->login.id, patient->login.name, 
+            message, k+1, patient->login.id, patient->login.name, 
             status=='0'?str1:(status=='1'?str2:str3));
             if(status!='0')
             {
@@ -108,12 +108,52 @@ void platform_manage_chg_doc(doctor_t *doctor,int8_t* message, int8_t (*doc_msg)
     }
 }
 
+void platform_manage_chg_pat(patient_t *patient,int8_t* message, int8_t (*pat_msg)[31]){
+
+    if(pat_msg[1][0]=='1')
+    {
+        //改名字
+        sprintf(message, "名字 %s 改为 %s\r\n", patient->login.name, pat_msg[2]);
+        strcpy(patient->login.name, pat_msg[2]);
+        
+    }else if(pat_msg[1][0]=='2'){
+        //登录密码
+        sprintf(message, "密码 %s 改为 %s\r\n", patient->login.passwd, pat_msg[2]);
+        strcpy(patient->login.passwd, pat_msg[2]);
+    }
+}
+
+void platform_manage_add_doc(int8_t *message, int8_t *parameter)
+{
+    int8_t (*doc_msg)[31] =parameter ;
+    int8_t doc_id[21];
+    time_t timep;
+    struct tm *p;
+    doctor_t *doctor;
+    
+    p=gmtime(&timep);
+    
+    sprintf(doc_id, "%d%d%d%04d",1900+p->tm_year, 1+p->tm_mon, p->tm_mday, manager.doctors_LM.uxNumberOfItems);
+    //printf("测试 %s %s %s\r\n", doc_id, doc_msg[1], doc_msg[2]);while(1);
+    doctor = platform_add_doctor(doc_msg[0], doc_id, doc_msg[3], doc_msg[1], doc_msg[2], doc_msg[5][0], doc_msg[4]);
+    if(doctor != -1)
+    {
+        sprintf(message, "添加成功\r\n");
+        
+    }else{
+        sprintf(message, "添加失败,输入信息有误\r\n");
+    }
+
+}
+
+
 //这个是用户的平台接口,根据命令返回信息
 void platform_manage_commend(int8_t commend,int8_t *message, void *parameter)
 {
     int8_t (*doc_msg)[31];
     int32_t *p;
     doctor_t *doctor;
+    patient_t *patient;
     switch (commend)
     {
     case 1:
@@ -121,10 +161,11 @@ void platform_manage_commend(int8_t commend,int8_t *message, void *parameter)
         platform_get_manage_login_data(message);
         break;
     case 2:
-    
+        //返回病人的数量
         *(int *)parameter = listCURRENT_LIST_LENGTH(&manager.patient_LM);
         break;
     case 3:
+        //获取某一系列病人的信息
         p = parameter;
         platform_manage_getpat_data(message, *p, *(p+1));
         break;
@@ -175,6 +216,49 @@ void platform_manage_commend(int8_t commend,int8_t *message, void *parameter)
     case 7:
         platform_department_init(parameter);
         sprintf(message, "添加成功\r\n");
+        break;
+    case 8:
+        platform_manage_add_doc(message, parameter);
+        break;
+    case 9:
+        //获取一个医生的信息
+        patient = platform_get_patient(parameter);
+        if(patient!=-1)
+        {
+            sprintf(message, "病人 %s 编号 %s\r\n",
+            patient->login.name, 
+            patient->login.id);
+        }else{
+            sprintf(message, "没有这一个病人\r\n");
+            *(int8_t *)parameter = 0;
+        }
+        break;
+    case 10:
+        //删除一个病人
+        patient = platform_get_patient(parameter);
+        if(patient!=-1)
+        {
+            sprintf(message, "已经删除病人 %s 编号 %s\r\n",
+            patient->login.name, 
+            patient->login.id);
+            platform_del_patient(patient);
+        }else{
+            sprintf(message, "没有这一个病人\r\n");
+        }
+        break;
+    case 11:
+        //对病人进行修改
+        doc_msg = parameter;
+        patient = platform_get_patient(doc_msg[0]);
+        //printf("测试");while(1);
+        if(patient!=-1)
+        {
+            
+            platform_manage_chg_pat(patient, message, parameter);
+        }else{
+            sprintf(message, "没有这一个病人\r\n");
+        }
+        break;
     default:
         break;
     }

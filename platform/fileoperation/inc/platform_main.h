@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
+#include <time.h>
 //ԤԼ״̬
 #define WITHOUT_APPLICATION             0
 #define FIRST_VISIT_DOCTOR              1
