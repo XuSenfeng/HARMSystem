@@ -7,7 +7,7 @@
 #define COMMEND_PAT_GET_DOC_DTA_D           3
 #define COMMEND_PAT_GET_DOC_FIRST_PAT       4
 #define COMMEND_PAT_DEAL_FST_PAT            5
-
+#define COMMEND_PAT_ADD_PAT_MSG             6
 
 #define MESSAGE_STEP                       5
 void app_doctor_dealwith(base_data *login_data);

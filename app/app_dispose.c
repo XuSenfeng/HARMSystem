@@ -1,3 +1,21 @@
+/**
+  ******************************************************************************
+  * @file    app_dispose.c
+  * @version V1.0
+  * @date    2023-12-10
+  * @brief   这个是app层次相关的三个用户的通用文件
+  * @author  XvSenfeng(焦浩洋)
+  ******************************************************************************
+  * @attention
+  * 本程序由XvSenfeng创建并免费开源共享
+  * 你可以任意查看、使用和修改，并应用到自己的项目之中
+  * 程序版权归XvSenfeng所有，任何人或组织不得将其据为己有
+  * 如果你发现程序中的漏洞或者笔误，可通过邮件向我们反馈：1458612070@qq.com
+  * 发送邮件之前，你可以先到更新动态页面查看最新程序，如果此问题已经修改，则无需再发邮件
+  * https://github.com/XuSenfeng
+  ******************************************************************************
+  */ 
+
 #include "app_dispose.h"
 
 int8_t app_get_choice()
@@ -37,38 +55,39 @@ int8_t app_welcome(void)
 
 
 
-void app_login(base_data *login_data)
+int8_t app_login(base_data *login_data)
 {
     
     printf("您的选择是: %c\r\n", login_data->identity);
     switch (login_data->identity)
     {
     case '1':
-        if(app_patient_login(login_data))
+        if(app_patient_login(login_data)==1)
         {
-
+            return 1;
         }
         break;
     case '2':
-        if(app_doctor_login(login_data))
+        if(app_doctor_login(login_data)==1)
         {
-
+            return 1;
         }
         break;
     case '3':
-        if(app_manage_login(login_data)){
-
+        if(app_manage_login(login_data)==1){
+            return 1;
         }
         break;
     default:
-    printf("您的输入有误,请重新输入!\r\n");
+        printf("您的输入有误,请重新输入!\r\n");
+        return -1;
         break;
     }
+    return -1;
 }
 
 void app_successed_login(base_data *login_data)
 {
-    printf("登录成功!!! %c\r\n", login_data->identity);
     switch (login_data->identity)
     {
     case '1':

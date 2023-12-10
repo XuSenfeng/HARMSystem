@@ -1,3 +1,22 @@
+/**
+  ******************************************************************************
+  * @file    platform_patient.c
+  * @version V1.0
+  * @date    2023-12-10
+  * @brief   这个文件是数据库的API层,主要是为了实现病人的命令API函数
+  * @author  XvSenfeng(焦浩洋)
+  ******************************************************************************
+  * @attention
+  * 本程序由XvSenfeng创建并免费开源共享
+  * 你可以任意查看、使用和修改，并应用到自己的项目之中
+  * 程序版权归XvSenfeng所有，任何人或组织不得将其据为己有
+  * 如果你发现程序中的漏洞或者笔误，可通过邮件向我们反馈：1458612070@qq.com
+  * 发送邮件之前，你可以先到更新动态页面查看最新程序，如果此问题已经修改，则无需再发邮件
+  * https://github.com/XuSenfeng
+  ******************************************************************************
+  */ 
+
+
 #include "platform_patient.h"
 extern manager_t manager;
 
@@ -84,7 +103,8 @@ void platform_patient_commend(int8_t commend, char *id, char *message, void *par
     int32_t *p;
     int8_t (*p_8)[30];
     int8_t id_n[21];
-
+    time_t timep;
+    struct tm *p_tm;
     if(patient != -1 || strlen(id)==0)
     {
         switch (commend)
@@ -115,9 +135,11 @@ void platform_patient_commend(int8_t commend, char *id, char *message, void *par
         case 5:
             p_8 = parameter;
             sprintf(message, "");
-            sprintf(id_n,"1%03d", manager.patient_LM.uxNumberOfItems+1);
-            //printf("您输入的密码 %s , 用户名 %s, id %s\r\n", *p_8, *(p_8+1), id_n);
-            patient = platform_add_patient(*p_8, id_n, *(p_8+1), '0', "0");
+            time(&timep);
+            p_tm=gmtime(&timep);
+            sprintf(id_n, "%04d%02d%02d%04d",1900+p_tm->tm_year, 1+p_tm->tm_mon, p_tm->tm_mday, manager.patient_LM.uxNumberOfItems);
+            //printf("年%d 月%d 日%d\r\n", 1900+p_tm->tm_year, 1+p_tm->tm_mon, p_tm->tm_mday);
+            patient = platform_add_patient(*p_8, id_n, *(p_8+1), '0', "0", "无");
             if(patient==-1)
             {
                 sprintf(message, "获取用户失败,原因是生成的id重复,请检查后台的数据\r\n");
@@ -161,4 +183,5 @@ void platform_get_patient_login_data(patient_t *patient, int8_t *message)
         doctor = platform_get_doc(patient->doc_id);
         sprintf(message, "%s您当前的是 %s 门诊的 %s 医生\r\n", message, doctor->service, doctor->login.name);
     }
+    sprintf(message, "%s您当前的信息: \r\n%s\r\n", message, patient->message);
 }

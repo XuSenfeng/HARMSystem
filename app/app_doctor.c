@@ -1,3 +1,21 @@
+/**
+  ******************************************************************************
+  * @file    app_doctor.c
+  * @version V1.0
+  * @date    2023-12-10
+  * @brief   这个文件是app层次的医生相关的操作platform_login, platform_doctor_commend
+  * @author  XvSenfeng(焦浩洋)
+  ******************************************************************************
+  * @attention
+  * 本程序由XvSenfeng创建并免费开源共享
+  * 你可以任意查看、使用和修改，并应用到自己的项目之中
+  * 程序版权归XvSenfeng所有，任何人或组织不得将其据为己有
+  * 如果你发现程序中的漏洞或者笔误，可通过邮件向我们反馈：1458612070@qq.com
+  * 发送邮件之前，你可以先到更新动态页面查看最新程序，如果此问题已经修改，则无需再发邮件
+  * https://github.com/XuSenfeng
+  ******************************************************************************
+  */ 
+
 #include "app_doctor.h"
 
 //医生的登录函数,成功的话返回1,否则返回0
@@ -69,6 +87,7 @@ void app_doctor_get_pat_msg(base_data *login_data, int8_t *data)
 void app_doctor_deal_pat(base_data *login_data, int8_t *message)
 {
     int8_t choice;
+    int8_t msg_to_pat[100];
     system("CLS");
     printf("即将对现在您的预约的病人进行传唤....\r\n");
     platform_doctor_commend(COMMEND_PAT_GET_DOC_FIRST_PAT, login_data->id, message, 0);
@@ -84,22 +103,35 @@ void app_doctor_deal_pat(base_data *login_data, int8_t *message)
     case '1':
         platform_doctor_commend(COMMEND_PAT_DEAL_FST_PAT, login_data->id, message, choice);
         printf(message);
-        system("pause");
         break;
     case '2':
         platform_doctor_commend(COMMEND_PAT_DEAL_FST_PAT, login_data->id, message, choice);
         printf(message);
-        system("pause");
+
         break;   
     case '3':
         platform_doctor_commend(COMMEND_PAT_DEAL_FST_PAT, login_data->id, message, choice);
-        printf(message);
-        system("pause");     
+        printf(message); 
         break;
     case '4':
         break;
     default:
         break;
+    }
+    system("pause");
+    printf("请问是否需要给病人追加信息?\r\n");
+    printf("1. 确定\r\n");
+    printf("2. 取消\r\n");
+    printf("请输入您的选择: ");
+    choice = app_get_choice();
+    if(choice == '1')
+    {
+        //printf("\r\n输入的信息里面请务必不要有空格和换行!!!!!!!!\r\n");
+        printf("请输入您想传达的信息: ");
+        scanf("%s", msg_to_pat);
+        platform_doctor_commend(COMMEND_PAT_ADD_PAT_MSG, login_data->id, message, msg_to_pat);
+        printf(message); 
+        system("pause");
     }
 }
 

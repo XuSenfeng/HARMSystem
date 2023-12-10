@@ -1,3 +1,22 @@
+/**
+  ******************************************************************************
+  * @file    platform_manage.c
+  * @version V1.0
+  * @date    2023-12-10
+  * @brief   这个文件是数据库的API层,主要是为了实现管理员的命令API函数
+  * @author  XvSenfeng(焦浩洋)
+  ******************************************************************************
+  * @attention
+  * 本程序由XvSenfeng创建并免费开源共享
+  * 你可以任意查看、使用和修改，并应用到自己的项目之中
+  * 程序版权归XvSenfeng所有，任何人或组织不得将其据为己有
+  * 如果你发现程序中的漏洞或者笔误，可通过邮件向我们反馈：1458612070@qq.com
+  * 发送邮件之前，你可以先到更新动态页面查看最新程序，如果此问题已经修改，则无需再发邮件
+  * https://github.com/XuSenfeng
+  ******************************************************************************
+  */ 
+
+
 #include "platform_manage.h"
 extern manager_t manager;
 //获取登录信息
@@ -30,8 +49,8 @@ void platform_manage_getpat_data(int8_t *message, int32_t begin, int32_t num){
         if(k>=begin && k<begin + num){
             sprintf(message, "%s病人 %d 号的id是: %s 名字: %s 当前的状态是 %s\r\n", 
             message, k+1, patient->login.id, patient->login.name, 
-            status=='0'?str1:(status=='1'?str2:str3));
-            if(status!='0')
+            status==0?str1:(status==1?str2:str3));
+            if(status!=0)
             {
                 doctor = platform_get_doc(patient->doc_id);
                 if(doctor!=-1)
@@ -130,9 +149,8 @@ void platform_manage_add_doc(int8_t *message, int8_t *parameter)
     time_t timep;
     struct tm *p;
     doctor_t *doctor;
-    
+    time(&timep);
     p=gmtime(&timep);
-    
     sprintf(doc_id, "%d%d%d%04d",1900+p->tm_year, 1+p->tm_mon, p->tm_mday, manager.doctors_LM.uxNumberOfItems);
     //printf("测试 %s %s %s\r\n", doc_id, doc_msg[1], doc_msg[2]);while(1);
     doctor = platform_add_doctor(doc_msg[0], doc_id, doc_msg[3], doc_msg[1], doc_msg[2], doc_msg[5][0], doc_msg[4]);

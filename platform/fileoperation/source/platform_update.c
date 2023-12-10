@@ -1,5 +1,213 @@
+/**
+  ******************************************************************************
+  * @file    platform_update.c
+  * @version V1.0
+  * @date    2023-12-10
+  * @brief   这个文件是数据库的底层文件,会从底层文件里面读取信息,进行信息的更新
+  * @author  XvSenfeng(焦浩洋)
+  ******************************************************************************
+  * @attention
+  * 本程序由XvSenfeng创建并免费开源共享
+  * 你可以任意查看、使用和修改，并应用到自己的项目之中
+  * 程序版权归XvSenfeng所有，任何人或组织不得将其据为己有
+  * 如果你发现程序中的漏洞或者笔误，可通过邮件向我们反馈：1458612070@qq.com
+  * 发送邮件之前，你可以先到更新动态页面查看最新程序，如果此问题已经修改，则无需再发邮件
+  * https://github.com/XuSenfeng
+  ******************************************************************************
+  */ 
+
+
 #include "platform_update.h"
 extern manager_t manager;
+/**
+  * @brief  更新现在的数据,把数据写入到文件里面
+  * @param  无
+  * @retval 无
+  */
+void platform_update(){
+    int32_t i, j;
+    one_department_t *department;
+    outpatient_service_t *service;
+    doctor_t *doctor;
+    patient_t *patient;
+    FILE *message_f;
+    message_f = fopen("document.txt", "w");
+    ListItem_t *list_test2, *list_test;
+    //获取部门的链表
+    fprintf(message_f, "%d\n", manager.departments_LM.uxNumberOfItems);
+    list_test = listGET_HEAD_ENTRY(&manager.departments_LM);
+    department = listGET_LIST_ITEM_OWNER(list_test);
+    for(i=0;i<manager.departments_LM.uxNumberOfItems;i++)
+    {
+        //进入一个门诊
+        fprintf(message_f, "%s %d", department->name, department->services_LM.uxNumberOfItems);
+        list_test2 = listGET_HEAD_ENTRY(&department->services_LM);
+        service = listGET_LIST_ITEM_OWNER(list_test2);
+        for(j=0;j<department->services_LM.uxNumberOfItems;j++)
+        {
+            fprintf(message_f, " %s", service->name);
+            list_test2 = listGET_NEXT(list_test2);
+            service = listGET_LIST_ITEM_OWNER(list_test2);
+        }
+        fprintf(message_f, "\n");
+        list_test = listGET_NEXT(list_test);
+        department = listGET_LIST_ITEM_OWNER(list_test);
+    }
+    //输入医生
+    list_test = listGET_HEAD_ENTRY(&manager.doctors_LM);
+    doctor = listGET_LIST_ITEM_OWNER(list_test);
+    fprintf(message_f, "%d\n", manager.doctors_LM.uxNumberOfItems);
+    for(i=0;i<manager.doctors_LM.uxNumberOfItems;i++)
+    {
+        fprintf(message_f, "%s %s %s %s %s %d %s\n", doctor->login.id, doctor->login.name, doctor->login.passwd, doctor->service, doctor->level, doctor->num_to_accept, doctor->workday);
+        list_test = listGET_NEXT(list_test);
+        doctor = listGET_LIST_ITEM_OWNER(list_test);
+    }
+    //输入病人
+    list_test = listGET_HEAD_ENTRY(&manager.patient_LM);
+    patient = listGET_LIST_ITEM_OWNER(list_test);
+    fprintf(message_f, "%d\n", manager.patient_LM.uxNumberOfItems);
+    for(i=0;i<manager.patient_LM.uxNumberOfItems;i++)
+    {
+        fprintf(message_f, "%s %s %s %d %s %s", patient->login.id, patient->login.name, patient->login.passwd, patient->doctor_L.xItemValue,  patient->doc_id, patient->message);
+        list_test = listGET_NEXT(list_test);
+        patient = listGET_LIST_ITEM_OWNER(list_test);
+    }  
+    fclose(message_f);
+
+}
+/**
+  * @brief  根据一个人输入的信息判断是不是正确的
+  * @param  输入的id
+  * @param  输入的密码
+  * @param  要核对的登录信息
+  * @retval 正确:1 不正确:2
+  */
+int platform_is_right(char *id, char *passwd, message_to_login_t * message)
+{
+    if((strcmp(id, message->id)==0) && (strcmp(passwd, message->passwd)==0))
+    {
+
+        return 1;
+    }else{
+        return -1;
+    }
+}
+
+//对文件进行读操作
+void platform_department_init(int8_t *file_name)
+{
+    //部门初始化
+    FILE *message_f;
+    int32_t i, j, management_num, service_num, patient_num;
+    one_department_t *department;
+    outpatient_service_t *service;
+    int8_t pat_message[140];
+    int8_t name[21];
+    //医生初始化
+    int32_t doctor_num;
+    int8_t id[21], passwd[30], work[20], status, level[30]; 
+    int8_t workday[15];
+    message_f = fopen(file_name, "r");
+    fscanf(message_f, "%d", &management_num);
+    //printf("*******部门初始化*****%d\r\n", management_num);
+    for(i=0;i<management_num;i++)
+    {
+        //读取格式化的部门信息
+        fscanf(message_f, "%s %d", name, &service_num);
+        department = platform_init_department(name);
+        for(j=0;j<service_num;j++)
+        {
+            //初始化现有的门诊
+            fscanf(message_f, "%s", name);
+            platform_init_service(name, department);
+        }
+    }
+#if DEBUG
+    ListItem_t *list_test, *list_test2;
+    /*测试代码, 会显示现在已经注册的所有的部门以及门诊*/
+    printf("现在有%d个部门\r\n", manager.departments_LM.uxNumberOfItems);
+    list_test = listGET_HEAD_ENTRY(&manager.departments_LM);
+    department = listGET_LIST_ITEM_OWNER(list_test);
+    for(i=0;i<manager.departments_LM.uxNumberOfItems;i++)
+    {
+        printf("部门%s下面有%d个门诊\r\n", department->name, department->services_LM.uxNumberOfItems);
+        list_test2 = listGET_HEAD_ENTRY(&department->services_LM);
+        service = listGET_LIST_ITEM_OWNER(list_test2);
+        for(j=0;j<department->services_LM.uxNumberOfItems;j++)
+        {
+            printf("门诊%d是: %s\r\n", j+1, service->name);
+            list_test2 = listGET_NEXT(list_test2);
+            service = listGET_LIST_ITEM_OWNER(list_test2);
+        }
+
+
+        list_test = listGET_NEXT(list_test);
+        department = listGET_LIST_ITEM_OWNER(list_test);
+    }
+    
+   if((service = platform_get_service("小儿内科"))!= -1)
+   {
+        printf("找到了%s\r\n", service->name);
+   }
+#endif
+    //在这里注册的是医生
+   fscanf(message_f, "%d", &doctor_num);
+   for(i=0;i<doctor_num;i++)
+   {
+        fscanf(message_f, "%s %s %s %s %s %d %s", id, name, passwd, work, level, &management_num, workday);
+        platform_add_doctor(name, id, passwd, work, level, management_num, workday);
+   }
+    //在这里注册病人
+    fscanf(message_f, "%d", &patient_num);
+   for(i=0;i<patient_num;i++)
+   {
+        fscanf(message_f, "%s %s %s %c %s", id, name, passwd, &status, work);
+        fgets(pat_message, 140, message_f);
+        platform_add_patient(name, id, passwd, status ,work, pat_message);
+   }
+#if DEBUG
+    patient_t *patient;
+    list_test = listGET_HEAD_ENTRY(&manager.patient_LM);
+    patient = listGET_LIST_ITEM_OWNER(list_test);
+    printf("一共有%d个病人\r\n", manager.patient_LM.uxNumberOfItems);
+    for(i=0;i<manager.patient_LM.uxNumberOfItems;i++)
+    {
+        printf("患者 %d 的名字是 %s 现在的状态是 %d\r\n", i+1, patient->login.name, patient->doctor_L.xItemValue);
+        list_test = listGET_NEXT(list_test);
+        patient = listGET_LIST_ITEM_OWNER(list_test);
+    }
+#endif
+}
+
+void platform_test(void)
+{
+    uint32_t ret;
+    ListItem_t * doctor_list, * patient_list;
+    doctor_t * doctor;
+    patient_t * patient;
+    printf("platform\r\n");
+    printf("链表里面有:%d\r\n", listCURRENT_LIST_LENGTH(&manager.doctors_LM));
+    doctor_list = listGET_HEAD_ENTRY(&manager.doctors_LM);
+    doctor = (doctor_t *)listGET_LIST_ITEM_OWNER(doctor_list);
+    printf("医生的信息: %s %s %s\r\n", doctor->login.id, doctor->login.name, doctor->login.passwd);
+    platform_add_patient("史凯歌", "222", "123456", 0, "1001", "无");
+    patient_list = listGET_HEAD_ENTRY(&manager.patient_LM);
+    patient = (patient_t *)listGET_LIST_ITEM_OWNER(patient_list);
+    printf("患者的信息: %s %s %s\r\n", patient->login.id, patient->login.name, patient->login.passwd);
+    platform_patient_appointment(patient, "1001");
+    ret = platform_get_patient_status(patient);
+    if(ret==WITHOUT_APPLICATION)
+    {
+        printf("没有预约\r\n");
+    }
+    else if(ret = 1)
+    {
+        printf("预约成功\r\n");
+    }
+
+}
+
 void platform_manage_init()
 {
     int i, j;
@@ -9,7 +217,7 @@ void platform_manage_init()
     vListInitialise(&manager.doctors_LM);
     vListInitialise(&manager.patient_LM);
     vListInitialise(&manager.departments_LM);
-    platform_add_patient("manager", "000", "123456", '0', "0");
+    platform_add_patient("manager", "000", "123456", '0', "0", "无");
     platform_department_init("document.txt");
 }
 void platform_manage_out()
@@ -245,7 +453,7 @@ outpatient_service_t * platform_init_service(char *name, one_department_t* depar
 }
 
 //申请一个患者的的结构体,并挂载在管理者名下
-patient_t * platform_init_patient(char *name, char *id, char *passwd)
+patient_t * platform_init_patient(int8_t *name, int8_t *id, int8_t *passwd, int8_t *message)
 {
     patient_t *patient_to_init;
     patient_to_init = malloc(sizeof(patient_t));
@@ -265,11 +473,12 @@ patient_t * platform_init_patient(char *name, char *id, char *passwd)
     strcpy(patient_to_init->login.passwd, passwd);
     //设置当前的状态是没有预约
     patient_to_init->doctor_L.xItemValue=0;
-
+    //设置初始的时候没有信息
+    strcpy(patient_to_init->message, message);
     return patient_to_init;
 }
 //添加一个病人,参数一:名字, 参数二: id, 参数3: 当前状态'0'没有预约, '1'预约没有初诊, '2'等待复诊, 参数四,医生的id
-void *platform_add_patient(int8_t *name, int8_t *id, int8_t *passwd, int8_t status, int8_t *doc_id)
+void *platform_add_patient(int8_t *name, int8_t *id, int8_t *passwd, int8_t status, int8_t *doc_id, int8_t *message)
 {
     
     doctor_t *doctor;
@@ -289,7 +498,7 @@ void *platform_add_patient(int8_t *name, int8_t *id, int8_t *passwd, int8_t stat
     }
     if(flog==0)
     {
-        patient = platform_init_patient(name, id, passwd);
+        patient = platform_init_patient(name, id, passwd, message);
     }else
     {
         //printf("\r\n添加病人 %s 编号 %s 失败,请不要输入重复的编号的病人...\r\n", name, id);
