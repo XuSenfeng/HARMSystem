@@ -78,9 +78,9 @@ void platform_update(){
 }
 /**
   * @brief  根据一个人输入的信息判断是不是正确的
-  * @param  输入的id
-  * @param  输入的密码
-  * @param  要核对的登录信息
+  * @param  id: 输入的id
+  * @param  passwd:输入的密码
+  * @param  message:要核对的登录信息结构体
   * @retval 正确:1 不正确:2
   */
 int platform_is_right(char *id, char *passwd, message_to_login_t * message)
@@ -93,8 +93,11 @@ int platform_is_right(char *id, char *passwd, message_to_login_t * message)
         return -1;
     }
 }
-
-//对文件进行读操作
+/**
+  * @brief  从文件中获取需要的信息
+  * @param  file_name: 文件的名字
+  * @retval 无
+  */
 void platform_department_init(int8_t *file_name)
 {
     //部门初始化
@@ -179,7 +182,11 @@ void platform_department_init(int8_t *file_name)
     }
 #endif
 }
-
+/**
+  * @brief  从文件中获取需要的信息
+  * @param  无
+  * @retval 无
+  */
 void platform_test(void)
 {
     uint32_t ret;
@@ -208,9 +215,14 @@ void platform_test(void)
 
 }
 
+
+/**
+  * @brief  初始化一个管理者
+  * @param  无
+  * @retval 无
+  */
 void platform_manage_init()
 {
-    int i, j;
     strcpy(manager.login.id, "000");
     strcpy(manager.login.name, "manage");   
     strcpy(manager.login.passwd, "123456");   
@@ -220,6 +232,11 @@ void platform_manage_init()
     platform_add_patient("manager", "000", "123456", '0', "0", "无");
     platform_department_init("document.txt");
 }
+/**
+  * @brief  删除管理者
+  * @param  无
+  * @retval 无
+  */
 void platform_manage_out()
 {
     patient_t *patient;
@@ -229,7 +246,16 @@ void platform_manage_out()
     else
     printf("删除管理员病人失败");
 }
-//申请一个医生的的结构体,并挂载在管理者名下
+
+/**
+  * @brief  申请一个医生的的结构体,并挂载在
+  * @param  name:他的名字
+  * @param  id:他的id
+  * @param  passwd:他的密码
+  * @param  work:他的职位
+  * @param  level:他的职称
+  * @retval 成功返回医生结构体,失败返回-1
+  */
 static doctor_t * platform_init_doctor(char *name, char *id, char *passwd , char *work, char *level)
 {
     outpatient_service_t * service;
@@ -284,7 +310,18 @@ static doctor_t * platform_init_doctor(char *name, char *id, char *passwd , char
 
     return doctor_to_init;
 }
-//添加一个医生
+
+/**
+  * @brief  添加一个医生
+  * @param  name:他的名字
+  * @param  id:他的id
+  * @param  passwd:他的密码
+  * @param  work:他的职位
+  * @param  level:他的职称
+  * @param  num_to_acp:他的最大接待数
+  * @param  workday: 工作时间
+  * @retval 成功返回医生结构体,失败返回-1
+  */
 doctor_t * platform_add_doctor(int8_t *name, int8_t *id, int8_t *passwd , int8_t *work, int8_t *level, int32_t num_to_acp, int8_t *workday)
 {
     int32_t i = listCURRENT_LIST_LENGTH(&manager.doctors_LM);
@@ -315,7 +352,12 @@ doctor_t * platform_add_doctor(int8_t *name, int8_t *id, int8_t *passwd , int8_t
     doctor->num_to_accept = num_to_acp;
     return doctor;
 }
-//获取一个医生的结构体
+
+/**
+  * @brief  获取一个医生的结构体
+  * @param  id:他的id
+  * @retval 成功返回医生结构体,失败返回-1
+  */
 doctor_t *platform_get_doc(char *id)
 {
     doctor_t *doctor=NULL;
@@ -342,7 +384,11 @@ doctor_t *platform_get_doc(char *id)
         return -1;
     }
 }
-//获取一个病人的结构体
+/**
+  * @brief  获取一个病人的结构体
+  * @param  id:他的id
+  * @retval 成功返回病人结构体,失败返回-1
+  */
 patient_t* platform_get_patient(char *id)
 {
     patient_t *patient=NULL;
@@ -368,6 +414,12 @@ patient_t* platform_get_patient(char *id)
         return -1;
     }
 }
+/**
+  * @brief  给一个病人进行预约
+  * @param  patient:病人的结构体
+  * @param  id:预约的医生的id
+  * @retval 成功返回1,失败返回-1
+  */
 int32_t platform_patient_appointment(patient_t *patient, char *doc_id)
 {
     doctor_t *doctor=NULL;
@@ -397,7 +449,11 @@ int32_t platform_patient_appointment(patient_t *patient, char *doc_id)
     }
 
 }
-//删除一个医生
+/**
+  * @brief  删除一个医生
+  * @param  doctor:要删除的医生结构体
+  * @retval 无
+  */
 void platform_del_doctor(doctor_t *doctor)
 {
     ListItem_t *list;
@@ -414,7 +470,12 @@ void platform_del_doctor(doctor_t *doctor)
     }
     free(doctor);
 }
-//删除一个病人
+
+/**
+  * @brief  删除一个病人
+  * @param  doctor:要删除的病人结构体
+  * @retval 无
+  */
 void platform_del_patient(patient_t *patient)
 {
     ListItem_t *list;
@@ -423,7 +484,11 @@ void platform_del_patient(patient_t *patient)
     uxListRemove(&patient->manage_L);
     free(patient);
 }
-//申请一个部门的的结构体,并挂载在管理者名下
+/**
+  * @brief  申请一个部门的的结构体,并挂载在管理者名下
+  * @param  name: 要添加的部门
+  * @retval 返回获取到的部门结构体
+  */
 one_department_t * platform_init_department(char *name)
 {
     one_department_t *department;
@@ -436,8 +501,12 @@ one_department_t * platform_init_department(char *name)
     strcpy(department->name, name);
     return department;
 }
-
-//申请一个门诊的的结构体,并挂载在部门名下
+/**
+  * @brief  申请一个部门的的结构体,并挂载在管理者名下申请一个门诊的的结构体,并挂载在部门名下
+  * @param  name:要添加的门诊
+  * @param  department:要挂载的部门
+  * @retval 返回获取到的门诊结构体
+  */
 outpatient_service_t * platform_init_service(char *name, one_department_t* department)
 {
     outpatient_service_t *service;
@@ -451,8 +520,14 @@ outpatient_service_t * platform_init_service(char *name, one_department_t* depar
     listSET_LIST_ITEM_OWNER(&service->department_L, service);
     return service;
 }
-
-//申请一个患者的的结构体,并挂载在管理者名下
+/**
+  * @brief  初始化一个病人
+  * @param  name:病人的名字
+  * @param  id:病人的id
+  * @param  passwd:病人的密码
+  * @param  message:要展示的信息
+  * @retval 返回获取到的病人结构体
+  */
 patient_t * platform_init_patient(int8_t *name, int8_t *id, int8_t *passwd, int8_t *message)
 {
     patient_t *patient_to_init;
@@ -477,7 +552,16 @@ patient_t * platform_init_patient(int8_t *name, int8_t *id, int8_t *passwd, int8
     strcpy(patient_to_init->message, message);
     return patient_to_init;
 }
-//添加一个病人,参数一:名字, 参数二: id, 参数3: 当前状态'0'没有预约, '1'预约没有初诊, '2'等待复诊, 参数四,医生的id
+/**
+  * @brief  添加一个病人
+  * @param  name:病人的名字
+  * @param  id:病人的id
+  * @param  passwd:病人的密码
+  * @param  status:当前状态'0'没有预约, '1'预约没有初诊, '2'等待复诊
+  * @param  doc_id:医生的id
+  * @param  message:要展示的信息
+  * @retval 返回获取到的病人结构体
+  */
 void *platform_add_patient(int8_t *name, int8_t *id, int8_t *passwd, int8_t status, int8_t *doc_id, int8_t *message)
 {
     
@@ -520,12 +604,23 @@ void *platform_add_patient(int8_t *name, int8_t *id, int8_t *passwd, int8_t stat
     return patient;
     
 }
-
+/**
+  * @brief  获取一个病人的状态
+  * @param  无
+  * @retval 当前状态0没有预约, 1预约没有初诊, 2等待复诊
+  */
 uint32_t platform_get_patient_status(patient_t *patient)
 {
     return patient->doctor_L.xItemValue;
 }
-//对病人进行就诊,参数,医生, 对应的病人, 以及'1':等待复诊, '2': 结束治疗
+
+/**
+  * @brief  对病人进行就诊
+  * @param  doctor:医生
+  * @param  patient:要处理的病人
+  * @param  choice:要处理的方式,'1':等待复诊, '2': 结束治疗
+  * @retval 无
+  */
 void platform_doc_deal_pat(doctor_t *doctor, patient_t *patient, int8_t choice)
 {
     if(choice == '1')

@@ -74,7 +74,7 @@ int32_t app_patient_login(base_data *login_data)
         printf(message);
         system("pause");
         system("cls");
-
+        return 1;
     }else
     {
         printf("\r\n输入有误返回上一级\r\n");

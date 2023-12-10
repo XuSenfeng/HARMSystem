@@ -93,8 +93,14 @@ void platform_patient_getdoc_data_L(int8_t *message, int32_t begin, int32_t num)
 
 }
 
-
-//这个是用户的平台接口,根据命令返回信息
+/**
+  * @brief  这个是用户的平台接口,根据命令返回信息
+  * @param  commend:要处理的命令
+  * @param  id:登录的病人id
+  * @param  message: 要返回的信息
+  * @param  parameter: 传进来的参数
+  * @retval 无
+  */
 void platform_patient_commend(int8_t commend, char *id, char *message, void *parameter)
 {
     patient_t *patient;
@@ -111,14 +117,15 @@ void platform_patient_commend(int8_t commend, char *id, char *message, void *par
         {
         case 1:
             //获取登录信息
-            //printf("病人%s, %s\r\n", patient->login.name, patient->login.passwd);
+            //不需要参数
             platform_get_patient_login_data(patient, message);
             break;
         case 2:
+            //返回当前的医生的数量
             *(int *)parameter = listCURRENT_LIST_LENGTH(&manager.doctors_LM);
             break;
         case 3:
-            //申请某一个医生
+            //申请某一个医生,参数是医生的id
             ret  = platform_patient_appointment(patient, parameter);
             if(ret == 1)
             {
@@ -129,10 +136,12 @@ void platform_patient_commend(int8_t commend, char *id, char *message, void *par
             }
             break;
         case 4:
+            //获取部分医生的信息, 参数是一个int32_t的数组,第一个是起始位置,第二个是结束的信息位置
             p = parameter;
             platform_patient_getdoc_data_d(message, *p, *(p+1));
             break;
         case 5:
+            //申请一个病人,传来的是parameter[3][30],第一个是名字, 第二个是密码,之后会用id返回申请到的人
             p_8 = parameter;
             sprintf(message, "");
             time(&timep);
@@ -163,8 +172,12 @@ void platform_patient_commend(int8_t commend, char *id, char *message, void *par
         sprintf(message, "获取病人失败\r\n");
     }
 }
-
-//获取登录信息
+/**
+  * @brief  获取登录信息
+  * @param  patient:要处理的病人
+  * @param  message:要要返回的信息保存的位置
+  * @retval 无
+  */
 void platform_get_patient_login_data(patient_t *patient, int8_t *message)
 {
     uint32_t status;
