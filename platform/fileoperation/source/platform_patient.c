@@ -93,6 +93,46 @@ void platform_patient_getdoc_data_L(int8_t *message, int32_t begin, int32_t num)
 
 }
 
+int8_t weekday[7][10] = {
+    "星期日"
+    "星期一",
+    "星期二",
+    "星期三",
+    "星期四",
+    "星期五",
+    "星期六",
+};
+
+void platform_patient_get_doc_time(int8_t *message,int8_t *parameter)
+{
+    int8_t weekday[7][14] = {
+    "星期日",
+    "星期一",
+    "星期二",
+    "星期三",
+    "星期四",
+    "星期五",
+    "星期六",
+    };
+    doctor_t *doctor;
+    sprintf(message, "\0");
+    doctor = platform_get_doc(parameter);
+    int32_t i;
+    if(doctor != -1)
+    {
+        sprintf(message, "|时间\t|上午\t|下午\t|\r\n");
+        sprintf(message, "%s-----------------------\r\n", message);
+        for(i=0;i<7;i++)
+        {
+            sprintf(message, "%s|%s\t|%s\t|%s\t|\r\n", message, weekday[i], doctor->workday[i]=='1'?"√":"X",  doctor->workday[i+1]=='1'?"√":"X");
+        }
+    }else{
+        printf(message, "没有找到这一个医生\r\n");
+    }
+}
+
+
+
 /**
   * @brief  这个是用户的平台接口,根据命令返回信息
   * @param  commend:要处理的命令
@@ -164,6 +204,8 @@ void platform_patient_commend(int8_t commend, char *id, char *message, void *par
             p = parameter;
             platform_patient_getdoc_data_L(message, *p, *(p+1));
             break;
+        case 7:
+            platform_patient_get_doc_time(message, parameter);
         default:
             break;
         }

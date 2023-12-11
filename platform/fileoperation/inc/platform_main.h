@@ -20,8 +20,6 @@
 #define DOC_LEVE_5              "医师"
 
 
-
-
 //测试代码开关
 #define DEBUG                           0
 //基础信息结构体

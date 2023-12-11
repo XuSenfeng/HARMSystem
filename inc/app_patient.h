@@ -15,7 +15,8 @@
 #define COMMEND_PAT_APLY_NEW_PAT        5
 //获取医生的信息通过职称
 #define COMMEND_PAT_GET_DOC_DTA_L       6
-
+//获取某一个医生的工作时间信息
+#define COMMEND_PAT_GET_DOC_TIME        7
 
 
 

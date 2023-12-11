@@ -90,6 +90,7 @@ void app_doctor_get_pat_msg(base_data *login_data, int8_t *message)
         if(i<-1)
             i=-1;
     }
+    system("pause");
 }
 /**
   * @brief  医生对自己的病人进行治疗处理

@@ -190,11 +190,21 @@ void app_patient_show_self(base_data *login_data, int8_t *message)
   */
 void app_patient_aply_doc(base_data *login_data, int8_t *message)
 {
-    system("pause");
+    system("CLS");
     int8_t doc_id[21];
     printf("请输入您想预约的医生的id: ");
     scanf("%s", doc_id);
     platform_patient_commend(COMMEND_PAT_APP_DOC, login_data->id, message, doc_id);
+    printf(message);
+    system("pause");
+}
+
+app_patient_get_doc_time(base_data *login_data, int8_t *message){
+    system("CLS");
+    int8_t doc_id[21];
+    printf("请输入您想获取信息的医生的id: ");
+    scanf("%s", doc_id);
+    platform_patient_commend(COMMEND_PAT_GET_DOC_TIME, login_data->id, message, doc_id);
     printf(message);
     system("pause");
 }
@@ -208,7 +218,7 @@ void app_patient_dealwith(base_data *login_data)
 {
     system("CLS");
     int8_t choice;
-    int8_t data[120] = {0};
+    int8_t data[1024] = {0};
     platform_patient_commend(COMMEND_PAT_GET_SELF_DATA, login_data->id, data);
     printf("%s", data);
 
@@ -222,6 +232,7 @@ void app_patient_dealwith(base_data *login_data)
         printf("1. 获取当前所有医生的信息\r\n");
         printf("2. 申请某一个医生的预约\r\n");
         printf("3. 再次显示当前状态\r\n");
+        printf("4. 获取某一个医生的工作时间\r\n");
         printf("0. 退出\r\n");
         printf("您的选择是: ");
         choice = app_get_choice();
@@ -235,6 +246,8 @@ void app_patient_dealwith(base_data *login_data)
             break;      
         case '3':
             app_patient_show_self(login_data, data);
+        case '4':
+            app_patient_get_doc_time(login_data, data);
         default:
             break;
         }

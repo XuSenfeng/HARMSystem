@@ -235,6 +235,7 @@ void app_manage_add_msg_file(base_data *login_data, int8_t *message)
     printf("**************************************************\r\n");
     printf("1. 确定\r\n");
     printf("2. 取消\r\n");
+    printf("请输入您的选择: ");
     choice = app_get_choice();
     if(choice == '1')
     {
