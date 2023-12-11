@@ -17,8 +17,11 @@
   */ 
 
 #include "app_doctor.h"
-
-//医生的登录函数,成功的话返回1,否则返回0
+/**
+  * @brief  医生的登录函数,成功的话返回1,否则返回0
+  * @param  login_data:一个保存登录的信息的结构体
+  * @retval 1成功登录-1登录失败
+  */
 int32_t app_doctor_login(base_data *login_data)
 {
     int8_t choice, num=3;
@@ -48,8 +51,13 @@ int32_t app_doctor_login(base_data *login_data)
         }
     }
 }
-
-void app_doctor_get_pat_msg(base_data *login_data, int8_t *data)
+/**
+  * @brief  医生获取自己的病人的信息
+  * @param  login_data:一个保存登录的信息的结构体
+  * @param  message:保存返回信息的结构体
+  * @retval 无
+  */
+void app_doctor_get_pat_msg(base_data *login_data, int8_t *message)
 {
     int32_t n;
     int8_t choice, times, left;
@@ -62,7 +70,7 @@ void app_doctor_get_pat_msg(base_data *login_data, int8_t *data)
     times = n/MESSAGE_STEP;
     left = n%MESSAGE_STEP;
     for(i=0;i<=times;i++){
-        //循环打印每一个部门的信息
+        //循环打印每一个病人
         parameter[0] = i*MESSAGE_STEP;
         if(i==times)
         {
@@ -73,8 +81,8 @@ void app_doctor_get_pat_msg(base_data *login_data, int8_t *data)
         }else
             parameter[1] = MESSAGE_STEP;
         
-        platform_doctor_commend(COMMEND_PAT_GET_DOC_DTA_D, login_data->id, data, parameter);
-        printf(data);
+        platform_doctor_commend(COMMEND_DOC_GET_PAT_DTA_D, login_data->id, message, parameter);
+        printf(message);
         printf("\r\n 输入u向上翻页 \r\n");
         page_s = getch();
         if(page_s=='u')
@@ -83,37 +91,46 @@ void app_doctor_get_pat_msg(base_data *login_data, int8_t *data)
             i=-1;
     }
 }
-
+/**
+  * @brief  医生对自己的病人进行治疗处理
+  * @param  login_data:一个保存登录的信息的结构体
+  * @param  message:保存返回信息的结构体
+  * @retval 无
+  */
 void app_doctor_deal_pat(base_data *login_data, int8_t *message)
 {
     int8_t choice;
     int8_t msg_to_pat[100];
     system("CLS");
     printf("即将对现在您的预约的病人进行传唤....\r\n");
-    platform_doctor_commend(COMMEND_PAT_GET_DOC_FIRST_PAT, login_data->id, message, 0);
+    platform_doctor_commend(COMMEND_DOC_GET_FIRST_PAT, login_data->id, message, 0);
     printf(message);
     printf("请您确定是否要对他进行治疗\r\n");
     printf("1. 进行治疗,需要进一步治疗\r\n");
     printf("2. 治疗结束,病人不需要进一步治疗\r\n");
     printf("3. 不对他进行治疗,请他去别的地方就诊\r\n");
-    printf("4. 暂时先不进行治疗,让病人继续等待\r\n");
+    printf("4. 暂时先不进行治疗\r\n");
     choice = app_get_choice();
     switch (choice)
     {
     case '1':
-        platform_doctor_commend(COMMEND_PAT_DEAL_FST_PAT, login_data->id, message, choice);
+        //更改病人的状态,并发送信息给病人
+        platform_doctor_commend(COMMEND_DOC_DEAL_FST_PAT, login_data->id, message, choice);
         printf(message);
         break;
     case '2':
-        platform_doctor_commend(COMMEND_PAT_DEAL_FST_PAT, login_data->id, message, choice);
+        //病人痊愈
+        platform_doctor_commend(COMMEND_DOC_DEAL_FST_PAT, login_data->id, message, choice);
         printf(message);
 
         break;   
     case '3':
-        platform_doctor_commend(COMMEND_PAT_DEAL_FST_PAT, login_data->id, message, choice);
+        //请病人走人
+        platform_doctor_commend(COMMEND_DOC_DEAL_FST_PAT, login_data->id, message, choice);
         printf(message); 
         break;
     case '4':
+        //不做处理
         break;
     default:
         break;
@@ -129,12 +146,16 @@ void app_doctor_deal_pat(base_data *login_data, int8_t *message)
         //printf("\r\n输入的信息里面请务必不要有空格和换行!!!!!!!!\r\n");
         printf("请输入您想传达的信息: ");
         scanf("%s", msg_to_pat);
-        platform_doctor_commend(COMMEND_PAT_ADD_PAT_MSG, login_data->id, message, msg_to_pat);
+        platform_doctor_commend(COMMEND_DOC_ADD_PAT_MSG, login_data->id, message, msg_to_pat);
         printf(message); 
         system("pause");
     }
 }
-
+/**
+  * @brief  医生的总的处理函数
+  * @param  login_data:一个保存登录的信息的结构体
+  * @retval 无
+  */
 void app_doctor_dealwith(base_data *login_data)
 {
     system("CLS");

@@ -25,38 +25,16 @@
 manager_t manager;
 
 
-//从现有的部门里面获取某一个部门,参数是部门的名字
-outpatient_service_t * platform_get_service(char *name)
-{
-    int32_t i, j;
-    one_department_t *department;
-    outpatient_service_t *service;
-    ListItem_t *list_test, *list_test2;
-    //获取部门的链表
-    list_test = listGET_HEAD_ENTRY(&manager.departments_LM);
-    department = listGET_LIST_ITEM_OWNER(list_test);
-    for(i=0;i<manager.departments_LM.uxNumberOfItems;i++)
-    {
-        //获取某个门诊的链表
-        list_test2 = listGET_HEAD_ENTRY(&department->services_LM);
-        service = listGET_LIST_ITEM_OWNER(list_test2);
-        for(j=0;j<department->services_LM.uxNumberOfItems;j++)
-        {
-            if(strcmp(service->name, name)==0)
-                return service;
-            list_test2 = listGET_NEXT(list_test2);
-            service = listGET_LIST_ITEM_OWNER(list_test2);
-        }
-        list_test = listGET_NEXT(list_test);
-        department = listGET_LIST_ITEM_OWNER(list_test);
-    }
-    return -1;
-
-}
 
 
 
-//根据一个人的id以及密码判断是否登陆成功,成功的话返回对应的那个人的结构体
+/**
+  * @brief  根据一个人的id以及密码判断是否登陆成功,成功的话返回对应的那个人的结构体
+  * @param  id:登录的id
+  * @param  passwd:登录的密码
+  * @param  choice:登录的选择'1'病人'2'医生'3'管理员
+  * @retval 1成功 -1失败
+  */
 int32_t platform_login(int8_t *id, int8_t *passwd, int8_t choice)
 {
     ListItem_t *list_to_use;
@@ -113,7 +91,12 @@ int32_t platform_login(int8_t *id, int8_t *passwd, int8_t choice)
     }
 }
 /*********************************************平台设置使用的函数***********************************************/
-//平台加载函数,用于平台的初始化,获取数据
+
+/**
+  * @brief  平台加载函数,用于平台的初始化,获取数据
+  * @param  无
+  * @retval 无
+  */
 void platform_init()
 {
     platform_manage_init();
@@ -124,7 +107,11 @@ void platform_init()
 
 
 
-//平台退出函数,主要用于释放空间
+/**
+  * @brief  平台退出函数,主要用于释放空间,以及保存信息
+  * @param  无
+  * @retval 无
+  */
 void platform_out()
 {
     int32_t i, j;

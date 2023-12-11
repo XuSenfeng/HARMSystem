@@ -66,7 +66,7 @@ typedef struct xLIST
 /* 获取链表的节点数 */
 #define listCURRENT_LIST_LENGTH( pxList )	( ( pxList )->uxNumberOfItems )
 
-/* 获取链表节点的OWNER，即TCB */
+/* 获取链表节点的OWNER */
 #define listGET_OWNER_OF_NEXT_ENTRY( pxTCB, pxList )										\
 {																							\
 	List_t * const pxConstList = ( pxList );											    \

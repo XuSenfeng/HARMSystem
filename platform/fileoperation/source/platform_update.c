@@ -19,6 +19,43 @@
 
 #include "platform_update.h"
 extern manager_t manager;
+
+
+/**
+  * @brief  从现有的部门里面获取某一个部门
+  * @param  name:部门的名字
+  * @retval 获取到的部门
+  */
+outpatient_service_t * platform_get_service(char *name)
+{
+    int32_t i, j;
+    one_department_t *department;
+    outpatient_service_t *service;
+    ListItem_t *list_test, *list_test2;
+    //获取部门的链表
+    list_test = listGET_HEAD_ENTRY(&manager.departments_LM);
+    department = listGET_LIST_ITEM_OWNER(list_test);
+    for(i=0;i<manager.departments_LM.uxNumberOfItems;i++)
+    {
+        //获取某个门诊的链表
+        list_test2 = listGET_HEAD_ENTRY(&department->services_LM);
+        service = listGET_LIST_ITEM_OWNER(list_test2);
+        for(j=0;j<department->services_LM.uxNumberOfItems;j++)
+        {
+            if(strcmp(service->name, name)==0)
+                return service;
+            list_test2 = listGET_NEXT(list_test2);
+            service = listGET_LIST_ITEM_OWNER(list_test2);
+        }
+        list_test = listGET_NEXT(list_test);
+        department = listGET_LIST_ITEM_OWNER(list_test);
+    }
+    return -1;
+
+}
+
+
+
 /**
   * @brief  更新现在的数据,把数据写入到文件里面
   * @param  无

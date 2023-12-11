@@ -19,12 +19,22 @@
 
 #include "platform_manage.h"
 extern manager_t manager;
-//获取登录信息
+/**
+  * @brief  获取登录信息
+  * @param  message:返回的显示信息
+  * @retval 无
+  */
 void platform_get_manage_login_data(int8_t *message)
 {
     sprintf(message, "尊敬的 %s 先生/女士 欢迎使用\r\n", manager.login.name);
 }
-
+/**
+  * @brief  获取病人的信息
+  * @param  message:返回的显示信息
+  * @param  begin:起始位置
+  * @param  num:获取的数量
+  * @retval 无
+  */
 void platform_manage_getpat_data(int8_t *message, int32_t begin, int32_t num){
 
     patient_t *patient;
@@ -37,7 +47,6 @@ void platform_manage_getpat_data(int8_t *message, int32_t begin, int32_t num){
     int8_t str3[] = "等待复诊";
     //清空缓冲区
     sprintf(message, "\0");
-
 
     list_test = listGET_HEAD_ENTRY(&manager.patient_LM);
     //跳过管理员使用的病人
@@ -67,7 +76,13 @@ void platform_manage_getpat_data(int8_t *message, int32_t begin, int32_t num){
     }
 
 }
-
+/**
+  * @brief  改变一个医生的信息
+  * @param  doctor:要修改的医生
+  * @param  message:返回的显示信息
+  * @param  parameter:获取到的参数 int8_t (*doc_msg)[31]类型 1选择 2修改以后得值
+  * @retval 无
+  */
 void platform_manage_chg_doc(doctor_t *doctor,int8_t* message, int8_t (*doc_msg)[31]){
     outpatient_service_t *service1, *service2;
     if(doc_msg[1][0]=='1')
@@ -126,7 +141,13 @@ void platform_manage_chg_doc(doctor_t *doctor,int8_t* message, int8_t (*doc_msg)
         }
     }
 }
-
+/**
+  * @brief  改变一个病人的信息
+  * @param  patient:要修改的病人
+  * @param  message:返回的显示信息
+  * @param  parameter:获取到的参数 int8_t (*pat_msg)[31]类型 1选择 2修改以后得值
+  * @retval 无
+  */
 void platform_manage_chg_pat(patient_t *patient,int8_t* message, int8_t (*pat_msg)[31]){
 
     if(pat_msg[1][0]=='1')
@@ -141,7 +162,12 @@ void platform_manage_chg_pat(patient_t *patient,int8_t* message, int8_t (*pat_ms
         strcpy(patient->login.passwd, pat_msg[2]);
     }
 }
-
+/**
+  * @brief  添加一个医生
+  * @param  message:返回的显示信息
+  * @param  parameter:获取到的参数 int8_t (*doc_msg)[31]类型, 0名字 1职位 2职称 3密码 4工作时间 5-0接待人数
+  * @retval 无
+  */
 void platform_manage_add_doc(int8_t *message, int8_t *parameter)
 {
     int8_t (*doc_msg)[31] =parameter ;
@@ -165,7 +191,13 @@ void platform_manage_add_doc(int8_t *message, int8_t *parameter)
 }
 
 
-//这个是用户的平台接口,根据命令返回信息
+/**
+  * @brief  这个是管理者的命令接口,根据命令返回信息
+  * @param  commend:获取到的命令
+  * @param  message:返回的显示信息
+  * @param  parameter:一个参数
+  * @retval 无
+  */
 void platform_manage_commend(int8_t commend,int8_t *message, void *parameter)
 {
     int8_t (*doc_msg)[31];
@@ -184,11 +216,13 @@ void platform_manage_commend(int8_t commend,int8_t *message, void *parameter)
         break;
     case 3:
         //获取某一系列病人的信息
+        //参数是一个int32_t的数组, 数字的第一个数字是起始位置,第二个数字是结束的位置
         p = parameter;
         platform_manage_getpat_data(message, *p, *(p+1));
         break;
     case 4:
         //获取一个医生的信息
+        //参数是医生的id
         doctor = platform_get_doc(parameter);
         if(doctor!=-1)
         {
@@ -204,6 +238,7 @@ void platform_manage_commend(int8_t commend,int8_t *message, void *parameter)
         break;
     case 5:
         //删除一个医生
+        //参数是医生的id
         doctor = platform_get_doc(parameter);
         if(doctor!=-1)
         {
@@ -219,7 +254,10 @@ void platform_manage_commend(int8_t commend,int8_t *message, void *parameter)
         break;
     case 6:
         //对医生的信息进行修改
-
+        /*参数是 (*doc_msg)[31]
+        第一个字符串是医生的id
+        第二个参数的[0]位置保存有要改变的参数
+        第三个参数是改变以后的参数*/
         doc_msg = parameter;
         doctor = platform_get_doc(doc_msg[0]);
         //printf("测试");while(1);
@@ -232,14 +270,18 @@ void platform_manage_commend(int8_t commend,int8_t *message, void *parameter)
         }
         break;
     case 7:
+        //参数是部门的名字字符串
         platform_department_init(parameter);
         sprintf(message, "添加成功\r\n");
         break;
     case 8:
+        //添加一个医生
+        //获取到的参数 int8_t (*doc_msg)[31]类型, 0名字 1职位 2职称 3密码 4工作时间 5-0接待人数
         platform_manage_add_doc(message, parameter);
         break;
     case 9:
         //获取一个医生的信息
+        //参数是医生的id
         patient = platform_get_patient(parameter);
         if(patient!=-1)
         {
@@ -253,6 +295,7 @@ void platform_manage_commend(int8_t commend,int8_t *message, void *parameter)
         break;
     case 10:
         //删除一个病人
+        //参数是病人的id
         patient = platform_get_patient(parameter);
         if(patient!=-1)
         {
@@ -266,6 +309,10 @@ void platform_manage_commend(int8_t commend,int8_t *message, void *parameter)
         break;
     case 11:
         //对病人进行修改
+        /*参数是 (*p)[31]
+        第一个字符串是病人的id
+        第二个参数的[0]位置保存有要改变的参数
+        第三个参数是改变以后的参数*/
         doc_msg = parameter;
         patient = platform_get_patient(doc_msg[0]);
         //printf("测试");while(1);

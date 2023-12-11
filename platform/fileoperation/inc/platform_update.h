@@ -1,6 +1,8 @@
 #ifndef PLATFORM_UPDATE_H
 #define PLATFORM_UPDATE_H
 #include "platform_main.h"
+/******实现数据库******/
+outpatient_service_t * platform_get_service(char *name);
 void platform_test(void);
 void platform_manage_init();
 doctor_t * platform_add_doctor(char *name, char *id, char *passwd , char *work, char *level, int32_t num_to_acp, int8_t *workday);

@@ -18,7 +18,12 @@
 
 #include "app_patient.h"
 
-//用户登录处理函数
+
+/**
+  * @brief  用户登录处理函数
+  * @param  login_data:一个保存自己登录的信息的结构体
+  * @retval 登录是否成功, 1成功, -1失败
+  */
 int32_t app_patient_login(base_data *login_data)
 {
     int8_t choice, num=3;
@@ -82,13 +87,18 @@ int32_t app_patient_login(base_data *login_data)
         system("cls");
     }
 }
-//功能1: 显示所有医生的信息
+/**
+  * @brief  调用接口获取并显示所有医生的信息
+  * @param  login_data:一个保存自己登录的信息的结构体
+  * @retval 无
+  */
 void app_patient_get_doc_msg(base_data *login_data)
 {
     int32_t n;
     int8_t choice, times, left;
     int8_t data[1024], page_s;
     int32_t parameter[3], i;
+    //获取现有的医生的数量
     platform_patient_commend(COMMEND_PAT_SET_DOC_NUM, login_data->id, 0, &n);
     printf("一共有 %d 个医生\r\n", n);
     system("pause");
@@ -101,6 +111,7 @@ void app_patient_get_doc_msg(base_data *login_data)
     switch (choice)
     {
     case '1':
+        //将所有的信息分层依次获取显示
         times = n/MESSAGE_STEP;
         left = n%MESSAGE_STEP;
         for(i=0;i<=times;i++){
@@ -118,6 +129,7 @@ void app_patient_get_doc_msg(base_data *login_data)
             printf(data);
             printf("\r\n 输入u向上翻页 \r\n");
             page_s = getch();
+            //检测是否需要会退回去
             if(page_s=='u')
                 i-=2;
             if(i<-1)
@@ -127,10 +139,10 @@ void app_patient_get_doc_msg(base_data *login_data)
         }
         break;
         case '2':
+        //按照不同的职称
         times = n/MESSAGE_STEP_L;
         left = n%MESSAGE_STEP_L;
         for(i=0;i<=times;i++){
-            //循环打印每一个部门的信息
             parameter[0] = i*MESSAGE_STEP_L;
             if(i==times)
             {
@@ -158,16 +170,27 @@ void app_patient_get_doc_msg(base_data *login_data)
         break;
     }
 }
-//功能3: 显示自己的状态
+/**
+  * @brief  功能3: 显示自己的状态
+  * @param  login_data:一个保存自己登录的信息的结构体
+  * @param  message:一个保存返回信息的字符串
+  * @retval 无
+  */
 void app_patient_show_self(base_data *login_data, int8_t *message)
 {
     platform_patient_commend(COMMEND_PAT_GET_SELF_DATA, login_data->id, message, 0);
     printf("%s", message);
     system("pause");
 }
-//功能2: 申请一个医生的预约
+/**
+  * @brief  功能2: 根据病人输入的id申请一个医生的预约
+  * @param  login_data:一个保存自己登录的信息的结构体
+  * @param  message:一个保存返回信息的字符串
+  * @retval 无
+  */
 void app_patient_aply_doc(base_data *login_data, int8_t *message)
 {
+    system("pause");
     int8_t doc_id[21];
     printf("请输入您想预约的医生的id: ");
     scanf("%s", doc_id);
@@ -176,7 +199,11 @@ void app_patient_aply_doc(base_data *login_data, int8_t *message)
     system("pause");
 }
 
-
+/**
+  * @brief  病人主要的处理函数
+  * @param  login_data:一个保存自己登录的信息的结构体
+  * @retval 无
+  */
 void app_patient_dealwith(base_data *login_data)
 {
     system("CLS");

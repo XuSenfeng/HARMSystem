@@ -17,6 +17,13 @@
   */ 
 
 #include "app_manage.h"
+
+
+/**
+  * @brief  医生的登录界面
+  * @param  login_data:一个保存登录的信息的结构体
+  * @retval 无
+  */
 int32_t app_manage_login(base_data *login_data)
 {
     int8_t choice, num=3;
@@ -46,14 +53,22 @@ int32_t app_manage_login(base_data *login_data)
         }
     }
 }
-//显示所有医生的信息,这里直接使用病人文件下面的实现
+/**
+  * @brief  显示所有医生的信息,这里直接使用病人文件下面的实现
+  * @param  login_data:一个保存登录的信息的结构体
+  * @retval 无
+  */
 void app_manage_get_doc_msg(base_data *login_data){
     app_patient_get_doc_msg(login_data);
 }
 
 
-
-//依次展示所有的病人信息
+/**
+  * @brief  依次展示所有的病人信息
+  * @param  login_data:一个保存登录的信息的结构体
+  * @param  message:传递信息使用的字符串
+  * @retval 无
+  */
 void app_manage_aply_pta_message(base_data *login_data, int8_t *message)
 {
     int32_t n;
@@ -91,7 +106,12 @@ void app_manage_aply_pta_message(base_data *login_data, int8_t *message)
     }
 }
 
-
+/**
+  * @brief  删除某一个医生
+  * @param  login_data:一个保存登录的信息的结构体
+  * @param  message:传递信息使用的字符串
+  * @retval 无
+  */
 void app_manage_del_doctor(base_data *login_data, int8_t *message){
     int8_t doc_id[21], choice;
     system("CLS");
@@ -116,7 +136,12 @@ void app_manage_del_doctor(base_data *login_data, int8_t *message){
     }
 
 }
-
+/**
+  * @brief  修改医生的信息
+  * @param  login_data:一个保存登录的信息的结构体
+  * @param  message:传递信息使用的字符串
+  * @retval 无
+  */
 void app_manage_amend_doctor(base_data *login_data, int8_t *message)
 {
     //信息数组1: id, 2:选择 3:改以后的值
@@ -185,7 +210,12 @@ void app_manage_amend_doctor(base_data *login_data, int8_t *message)
     }
 }
 
-
+/**
+  * @brief  通过文件添加信息
+  * @param  login_data:一个保存登录的信息的结构体
+  * @param  message:传递信息使用的字符串
+  * @retval 无
+  */
 void app_manage_add_msg_file(base_data *login_data, int8_t *message)
 {
     int8_t choice;
@@ -216,7 +246,12 @@ void app_manage_add_msg_file(base_data *login_data, int8_t *message)
     }
     
 }
-
+/**
+  * @brief  添加一个医生
+  * @param  login_data:一个保存登录的信息的结构体
+  * @param  message:传递信息使用的字符串
+  * @retval 无
+  */
 void app_manage_add_doctor(base_data *login_data, int8_t *message)
 {
     int8_t choice;
@@ -252,7 +287,12 @@ void app_manage_add_doctor(base_data *login_data, int8_t *message)
         system("pause");
     }
 }
-
+/**
+  * @brief  删除某一个病人通过id
+  * @param  login_data:一个保存登录的信息的结构体
+  * @param  message:传递信息使用的字符串
+  * @retval 无
+  */
 void app_manage_del_patient(base_data *login_data, int8_t *message)
 {
     int8_t choice;
@@ -289,7 +329,12 @@ void app_manage_del_patient(base_data *login_data, int8_t *message)
         system("pause");
     }
 }
-
+/**
+  * @brief  修改某一个病人的信息
+  * @param  login_data:一个保存登录的信息的结构体
+  * @param  message:传递信息使用的字符串
+  * @retval 无
+  */
 void app_manage_amend_pat(base_data *login_data, int8_t *message)
 {
     //信息数组1: id, 2:选择 3:改以后的值
@@ -327,8 +372,11 @@ void app_manage_amend_pat(base_data *login_data, int8_t *message)
     }
 }
 
-
-//总的处理函数
+/**
+  * @brief  管理员的总的处理函数
+  * @param  login_data:一个保存登录的信息的结构体
+  * @retval 无
+  */
 void app_manage_dealwith(base_data *login_data)
 {
     system("CLS");

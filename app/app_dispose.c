@@ -17,7 +17,11 @@
   */ 
 
 #include "app_dispose.h"
-
+/**
+  * @brief  获取一个选择,返回所有输入值的第一个数
+  * @param  无
+  * @retval 输入的值的第一个字符
+  */
 int8_t app_get_choice()
 {
     int8_t choice;
@@ -31,8 +35,11 @@ int8_t app_get_choice()
     fflush(stdin);
     return choice;
 }
-
-//登录界面显示函数
+/**
+  * @brief  登录界面显示函数,并且获取想要登录的人的身份
+  * @param  无
+  * @retval 身份'1'病人'2'医生'3'管理者
+  */
 int8_t app_welcome(void)
 {
     int8_t choice;
@@ -54,7 +61,11 @@ int8_t app_welcome(void)
 }
 
 
-
+/**
+  * @brief  检测某一个人是否可以成功登陆
+  * @param  login_data:一个保存登录的信息的结构体
+  * @retval 无
+  */
 int8_t app_login(base_data *login_data)
 {
     
@@ -85,7 +96,11 @@ int8_t app_login(base_data *login_data)
     }
     return -1;
 }
-
+/**
+  * @brief  成功登陆以后在这里根据不同的选择进入不同的执行函数
+  * @param  login_data:一个保存登录的信息的结构体
+  * @retval 无
+  */
 void app_successed_login(base_data *login_data)
 {
     switch (login_data->identity)
@@ -103,7 +118,11 @@ void app_successed_login(base_data *login_data)
         break;
     }
 }
-
+/**
+  * @brief  用于获取一个登录的密码,会在屏幕显示*
+  * @param password:保存密码的字符串
+  * @retval 无
+  */
 void app_get_passwd(char *password)
 {
     int i = 0; //记录密码长度
