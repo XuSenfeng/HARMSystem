@@ -17,11 +17,17 @@
 #define COMMEND_PAT_GET_DOC_DTA_L       6
 //获取某一个医生的工作时间信息
 #define COMMEND_PAT_GET_DOC_TIME        7
-
-
+//删除自己的预约
+#define COMMEND_PAT_DEL_DOC_APLY        8
+//通过id获取某一个医生的信息
+#define COMMEND_PAT_GET_DOC_MSG_id      9
+//通过时间获取某医生的信息
+#define COMMEND_PAT_GET_DOC_MSG_TIM_NUM 10
+//获取医生的信息通过时间
+#define COMMEND_PAT_GET_DOC_DTA_T       11
 
 //显示信息的时候的步长
-#define MESSAGE_STEP                    2
+#define MESSAGE_STEP                    1
 #define MESSAGE_STEP_L                  5
 
 void app_patient_dealwith(base_data *login_data);

@@ -106,7 +106,7 @@ void platform_update(){
     fprintf(message_f, "%d\n", manager.patient_LM.uxNumberOfItems);
     for(i=0;i<manager.patient_LM.uxNumberOfItems;i++)
     {
-        fprintf(message_f, "%s %s %s %d %s %s", patient->login.id, patient->login.name, patient->login.passwd, patient->doctor_L.xItemValue,  patient->doc_id, patient->message);
+        fprintf(message_f, "%s %s %s %d %s%s", patient->login.id, patient->login.name, patient->login.passwd, patient->doctor_L.xItemValue,  patient->doc_id, patient->message);
         list_test = listGET_NEXT(list_test);
         patient = listGET_LIST_ITEM_OWNER(list_test);
     }  
@@ -454,7 +454,7 @@ patient_t* platform_get_patient(char *id)
 /**
   * @brief  给一个病人进行预约
   * @param  patient:病人的结构体
-  * @param  id:预约的医生的id
+  * @param  id:预约的医生的id,设置为0的时候是取消预约
   * @retval 成功返回1,失败返回-1
   */
 int32_t platform_patient_appointment(patient_t *patient, char *doc_id)
@@ -462,22 +462,34 @@ int32_t platform_patient_appointment(patient_t *patient, char *doc_id)
     doctor_t *doctor=NULL;
     ListItem_t doc_list;
     int i;
-    doctor = platform_get_doc(doc_id);
+     
+    //病人之前有过预约信息
     if(patient->doctor_L.xItemValue != 0)
     {
         uxListRemove(&patient->doctor_L);
         patient->doctor_L.xItemValue = 0;
+        strcpy(patient->doc_id, "0\0");
     }
-
+    if(doc_id==0){
+        //为了取消预约
+        return 1;
+    }
+    doctor = platform_get_doc(doc_id);
     if(doctor!=-1)
     {
 #if DEBUG
         printf("已经预约到医生 %s \r\n", doctor->login.name);
 #endif
-        vListInsertEnd(&doctor->patient_LM, &patient->doctor_L);
-        patient->doctor_L.xItemValue = 1;
-        strcpy(patient->doc_id, doc_id);
-        return 1;
+        if(doctor->num_to_accept > doctor->patient_LM.uxNumberOfItems)
+        {
+            vListInsertEnd(&doctor->patient_LM, &patient->doctor_L);
+            patient->doctor_L.xItemValue = 1;
+            strcpy(patient->doc_id, doc_id);
+            return 1;
+        }else
+        {
+            return -1;
+        }
     }else{
 #if DEBUG
         printf("医生不存在\r\n");

@@ -94,28 +94,33 @@ int32_t app_patient_login(base_data *login_data)
   */
 void app_patient_get_doc_msg(base_data *login_data)
 {
-    int32_t n;
+    int32_t num_data[2];
     int8_t choice, times, left;
     int8_t data[1024], page_s;
     int32_t parameter[3], i;
+    int8_t doc_id[21];
+
     //获取现有的医生的数量
-    platform_patient_commend(COMMEND_PAT_SET_DOC_NUM, login_data->id, 0, &n);
-    printf("一共有 %d 个医生\r\n", n);
+    platform_patient_commend(COMMEND_PAT_SET_DOC_NUM, login_data->id, 0, num_data);
+    printf("一共有 %d 个部门, %d 个医生\r\n", num_data[0], num_data[1]);
     system("pause");
     system("CLS");
     printf("请选择观看模式\r\n");
     printf("1. 根据部门显示医生\r\n");
     printf("2. 按照职称显示所有医生\r\n");
+    printf("3. 显示某一个医生的详细信息(通过id)\r\n");
+    printf("4. 显示某一个时间段的所有医生\r\n");
     printf("请输入您的选择: ");
     choice = app_get_choice();
     switch (choice)
     {
     case '1':
         //将所有的信息分层依次获取显示
-        times = n/MESSAGE_STEP;
-        left = n%MESSAGE_STEP;
+        times = num_data[0]/MESSAGE_STEP;
+        left = num_data[0]%MESSAGE_STEP;
         for(i=0;i<=times;i++){
             //循环打印每一个部门的信息
+            system("CLS");
             parameter[0] = i*MESSAGE_STEP;
             if(i==times)
             {
@@ -133,16 +138,15 @@ void app_patient_get_doc_msg(base_data *login_data)
             if(page_s=='u')
                 i-=2;
             if(i<-1)
-                i=-1;
-            
-            system("CLS");
+                i=-1; 
         }
         break;
-        case '2':
+    case '2':
         //按照不同的职称
-        times = n/MESSAGE_STEP_L;
-        left = n%MESSAGE_STEP_L;
+        times = num_data[1]/MESSAGE_STEP_L;
+        left = num_data[1]%MESSAGE_STEP_L;
         for(i=0;i<=times;i++){
+            system("CLS");
             parameter[0] = i*MESSAGE_STEP_L;
             if(i==times)
             {
@@ -161,11 +165,55 @@ void app_patient_get_doc_msg(base_data *login_data)
             if(i<-1)
                 i=-1;
             
-            system("CLS");
+            
         }
         break;
-
-    
+    case '3':
+        printf("请输入您想获取的医生的id: ");
+        scanf("%s", doc_id);
+        platform_patient_commend(COMMEND_PAT_GET_DOC_MSG_id, login_data->id, data, doc_id);
+        printf(data);
+        system("pause");
+        break;
+    case '4':
+        printf("请输入查询的是哪一天?\r\n");
+        printf("周日:0 周一:1 周二:2 周三:3 周四:4 周五:5 周六:6\r\n");
+        printf("您的选择是: ");
+        scanf("%d", &parameter[0]);
+        printf("请输入查询的是上午还是下午?\r\n");
+        printf("1. 上午\r\n");
+        printf("2. 下午\r\n");
+        printf("您的选择是: ");   
+        scanf("%d", &parameter[1]);
+        platform_patient_commend(COMMEND_PAT_GET_DOC_MSG_TIM_NUM, login_data->id, data, parameter);
+        printf("一共有 %d 个医生\r\n", parameter[2]);
+        //按照不同的职称
+        if(parameter[2]>0){
+            times = parameter[2]/MESSAGE_STEP_L;
+            left = parameter[2]%MESSAGE_STEP_L;
+            parameter[2] = parameter[0]*2 + parameter[1]-1;
+            for(i=0;i<=times;i++){
+                system("CLS");
+                parameter[0] = i*MESSAGE_STEP_L;
+                if(i==times)
+                {
+                    if(left != 0){
+                        parameter[1] = left;
+                    }else
+                        break;
+                }else
+                    parameter[1] = MESSAGE_STEP_L;
+                platform_patient_commend(COMMEND_PAT_GET_DOC_DTA_T, login_data->id, data, parameter);
+                printf(data);
+                printf("\r\n 输入u向上翻页 \r\n");
+                page_s = getch();
+                if(page_s=='u')
+                    i-=2;
+                if(i<-1)
+                    i=-1;
+            }
+        }
+        break;
     default:
         break;
     }
@@ -199,15 +247,6 @@ void app_patient_aply_doc(base_data *login_data, int8_t *message)
     system("pause");
 }
 
-app_patient_get_doc_time(base_data *login_data, int8_t *message){
-    system("CLS");
-    int8_t doc_id[21];
-    printf("请输入您想获取信息的医生的id: ");
-    scanf("%s", doc_id);
-    platform_patient_commend(COMMEND_PAT_GET_DOC_TIME, login_data->id, message, doc_id);
-    printf(message);
-    system("pause");
-}
 
 /**
   * @brief  病人主要的处理函数
@@ -229,10 +268,10 @@ void app_patient_dealwith(base_data *login_data)
         printf("*            请选择你需要的服务            *\r\n");
         printf("*                                          *\r\n");
         printf("********************************************\r\n");
-        printf("1. 获取当前所有医生的信息\r\n");
+        printf("1. 获取当前医生的信息\r\n");
         printf("2. 申请某一个医生的预约\r\n");
         printf("3. 再次显示当前状态\r\n");
-        printf("4. 获取某一个医生的工作时间\r\n");
+        printf("4. 取消预约\r\n");
         printf("0. 退出\r\n");
         printf("您的选择是: ");
         choice = app_get_choice();
@@ -246,8 +285,12 @@ void app_patient_dealwith(base_data *login_data)
             break;      
         case '3':
             app_patient_show_self(login_data, data);
+            break;
         case '4':
-            app_patient_get_doc_time(login_data, data);
+            platform_patient_commend(COMMEND_PAT_DEL_DOC_APLY, login_data->id, data, 0);
+            printf(data);
+            system("pause");
+            break;
         default:
             break;
         }
