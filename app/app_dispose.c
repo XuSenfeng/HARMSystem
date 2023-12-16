@@ -91,10 +91,10 @@ int8_t app_login(base_data *login_data)
         break;
     default:
         printf("您的输入有误,请重新输入!\r\n");
-        return -1;
+        return ERROR;
         break;
     }
-    return -1;
+    return ERROR;
 }
 /**
   * @brief  成功登陆以后在这里根据不同的选择进入不同的执行函数

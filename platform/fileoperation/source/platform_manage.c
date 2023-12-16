@@ -62,7 +62,7 @@ void platform_manage_getpat_data(int8_t *message, int32_t begin, int32_t num){
             if(status!=0)
             {
                 doctor = platform_get_doc(patient->doc_id);
-                if(doctor!=-1)
+                if(doctor!=ERROR)
                 {
                     sprintf(message, "%s当前他的医生是 %s %s\r\n", 
                     message, doctor->login.name, doctor->login.id);
@@ -126,9 +126,9 @@ void platform_manage_chg_doc(doctor_t *doctor,int8_t* message, int8_t (*doc_msg)
     }else if(doc_msg[1][0]=='4'){
         //部门
         service1 = platform_get_service(doctor->service);
-        if(service1 != -1){
+        if(service1 != ERROR){
             service2 = platform_get_service(doc_msg[2]);
-            if(service2 != -1){
+            if(service2 != ERROR){
                 strcpy(doctor->service, doc_msg[2]);
                 uxListRemove(&doctor->service_L);
                 vListInsertEnd(&service2->doctors_LM, &doctor->service_L);
@@ -180,7 +180,7 @@ void platform_manage_add_doc(int8_t *message, int8_t *parameter)
     sprintf(doc_id, "%d%d%d%04d",1900+p->tm_year, 1+p->tm_mon, p->tm_mday, manager.doctors_LM.uxNumberOfItems);
     //printf("测试 %s %s %s\r\n", doc_id, doc_msg[1], doc_msg[2]);while(1);
     doctor = platform_add_doctor(doc_msg[0], doc_id, doc_msg[3], doc_msg[1], doc_msg[2], doc_msg[5][0], doc_msg[4]);
-    if(doctor != -1)
+    if(doctor != ERROR)
     {
         sprintf(message, "添加成功\r\n");
         
@@ -224,7 +224,7 @@ void platform_manage_commend(int8_t commend,int8_t *message, void *parameter)
         //获取一个医生的信息
         //参数是医生的id
         doctor = platform_get_doc(parameter);
-        if(doctor!=-1)
+        if(doctor != ERROR)
         {
             sprintf(message, "医生 %s 编号 %s 职称 %s 部门 %s\r\n",
             doctor->login.name, 
@@ -240,7 +240,7 @@ void platform_manage_commend(int8_t commend,int8_t *message, void *parameter)
         //删除一个医生
         //参数是医生的id
         doctor = platform_get_doc(parameter);
-        if(doctor!=-1)
+        if(doctor!= ERROR)
         {
             sprintf(message, "已经删除医生 %s 编号 %s 职称 %s 部门 %s\r\n",
             doctor->login.name, 
@@ -261,7 +261,7 @@ void platform_manage_commend(int8_t commend,int8_t *message, void *parameter)
         doc_msg = parameter;
         doctor = platform_get_doc(doc_msg[0]);
         //printf("测试");while(1);
-        if(doctor!=-1)
+        if(doctor!=ERROR)
         {
             
             platform_manage_chg_doc(doctor, message, parameter);
@@ -283,7 +283,7 @@ void platform_manage_commend(int8_t commend,int8_t *message, void *parameter)
         //获取一个医生的信息
         //参数是医生的id
         patient = platform_get_patient(parameter);
-        if(patient!=-1)
+        if(patient != ERROR)
         {
             sprintf(message, "病人 %s 编号 %s\r\n",
             patient->login.name, 
@@ -297,7 +297,7 @@ void platform_manage_commend(int8_t commend,int8_t *message, void *parameter)
         //删除一个病人
         //参数是病人的id
         patient = platform_get_patient(parameter);
-        if(patient!=-1)
+        if(patient!=ERROR)
         {
             sprintf(message, "已经删除病人 %s 编号 %s\r\n",
             patient->login.name, 
@@ -316,7 +316,7 @@ void platform_manage_commend(int8_t commend,int8_t *message, void *parameter)
         doc_msg = parameter;
         patient = platform_get_patient(doc_msg[0]);
         //printf("测试");while(1);
-        if(patient!=-1)
+        if(patient!=ERROR)
         {
             
             platform_manage_chg_pat(patient, message, parameter);

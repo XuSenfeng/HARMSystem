@@ -38,13 +38,13 @@ int32_t app_manage_login(base_data *login_data)
         app_get_passwd(login_data->passwd);
         fflush(stdin);
         ret = platform_login(login_data->id, login_data->passwd, '3');
-        if(ret == -1)
+        if(ret == ERROR)
         {
             num--;
             printf("\r\nid或者密码错误, 请重新输入\r\n");
             if(num==0)
             {
-                return -1;
+                return ERROR;
             }
         }
         else

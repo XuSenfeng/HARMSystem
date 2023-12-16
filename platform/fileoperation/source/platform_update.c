@@ -50,7 +50,7 @@ outpatient_service_t * platform_get_service(char *name)
         list_test = listGET_NEXT(list_test);
         department = listGET_LIST_ITEM_OWNER(list_test);
     }
-    return -1;
+    return ERROR;
 
 }
 
@@ -127,7 +127,7 @@ int platform_is_right(char *id, char *passwd, message_to_login_t * message)
 
         return 1;
     }else{
-        return -1;
+        return ERROR;
     }
 }
 /**
@@ -278,7 +278,7 @@ void platform_manage_out()
 {
     patient_t *patient;
     patient = platform_get_patient("000");
-    if(patient!=-1)
+    if(patient!=ERROR)
     platform_del_patient(patient);
     else
     printf("删除管理员病人失败");
@@ -291,7 +291,7 @@ void platform_manage_out()
   * @param  passwd:他的密码
   * @param  work:他的职位
   * @param  level:他的职称
-  * @retval 成功返回医生结构体,失败返回-1
+  * @retval 成功返回医生结构体,失败返回ERROR
   */
 static doctor_t * platform_init_doctor(char *name, char *id, char *passwd , char *work, char *level)
 {
@@ -328,7 +328,7 @@ static doctor_t * platform_init_doctor(char *name, char *id, char *passwd , char
     vListInsert(&manager.doctors_LM, &doctor_to_init->manage_L);
     //printf("%s", work);
     service = platform_get_service(work);
-    if(service!=-1){
+    if(service!=ERROR){
         vListInsert(&service->doctors_LM, &doctor_to_init->service_L);
     }else{
         //printf("医生挂载部门失败...");
@@ -357,7 +357,7 @@ static doctor_t * platform_init_doctor(char *name, char *id, char *passwd , char
   * @param  level:他的职称
   * @param  num_to_acp:他的最大接待数
   * @param  workday: 工作时间
-  * @retval 成功返回医生结构体,失败返回-1
+  * @retval 成功返回医生结构体,失败返回ERROR
   */
 doctor_t * platform_add_doctor(int8_t *name, int8_t *id, int8_t *passwd , int8_t *work, int8_t *level, int32_t num_to_acp, int8_t *workday)
 {
@@ -382,7 +382,7 @@ doctor_t * platform_add_doctor(int8_t *name, int8_t *id, int8_t *passwd , int8_t
     }else
     {
         //printf("添加医生 %s 编号 %s 失败,请不要输入重复的编号的医生...\r\n", name, id);
-        return -1;
+        return ERROR;
     }
     strcpy(doctor->workday, workday);
     strcpy(doctor->level, level);
@@ -393,7 +393,7 @@ doctor_t * platform_add_doctor(int8_t *name, int8_t *id, int8_t *passwd , int8_t
 /**
   * @brief  获取一个医生的结构体
   * @param  id:他的id
-  * @retval 成功返回医生结构体,失败返回-1
+  * @retval 成功返回医生结构体,失败返回ERROR
   */
 doctor_t *platform_get_doc(char *id)
 {
@@ -418,13 +418,13 @@ doctor_t *platform_get_doc(char *id)
         //printf("医生%s找到了\r\n", doctor->login.name);
         return doctor;
     }else{
-        return -1;
+        return ERROR;
     }
 }
 /**
   * @brief  获取一个病人的结构体
   * @param  id:他的id
-  * @retval 成功返回病人结构体,失败返回-1
+  * @retval 成功返回病人结构体,失败返回ERROR
   */
 patient_t* platform_get_patient(char *id)
 {
@@ -448,14 +448,14 @@ patient_t* platform_get_patient(char *id)
     {
         return patient;
     }else{
-        return -1;
+        return ERROR;
     }
 }
 /**
   * @brief  给一个病人进行预约
   * @param  patient:病人的结构体
   * @param  id:预约的医生的id,设置为0的时候是取消预约
-  * @retval 成功返回1,失败返回-1
+  * @retval 成功返回1,失败返回ERROR
   */
 int32_t platform_patient_appointment(patient_t *patient, char *doc_id)
 {
@@ -475,7 +475,7 @@ int32_t platform_patient_appointment(patient_t *patient, char *doc_id)
         return 1;
     }
     doctor = platform_get_doc(doc_id);
-    if(doctor!=-1)
+    if(doctor!=ERROR)
     {
 #if DEBUG
         printf("已经预约到医生 %s \r\n", doctor->login.name);
@@ -488,13 +488,13 @@ int32_t platform_patient_appointment(patient_t *patient, char *doc_id)
             return 1;
         }else
         {
-            return -1;
+            return ERROR;
         }
     }else{
 #if DEBUG
         printf("医生不存在\r\n");
 #endif
-        return -1;
+        return ERROR;
     }
 
 }
@@ -635,11 +635,11 @@ void *platform_add_patient(int8_t *name, int8_t *id, int8_t *passwd, int8_t stat
     }else
     {
         //printf("\r\n添加病人 %s 编号 %s 失败,请不要输入重复的编号的病人...\r\n", name, id);
-        return -1;
+        return ERROR;
     }
     strcpy(patient->doc_id, doc_id);
     doctor = platform_get_doc(doc_id);
-    if(doctor != -1)
+    if(doctor != ERROR)
     {
         if(status == '1')
         {

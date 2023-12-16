@@ -125,7 +125,7 @@ void platform_patient_get_doc_time(int8_t *message,int8_t *parameter)
     sprintf(message, "\0");
     doctor = platform_get_doc(parameter);
     int32_t i;
-    if(doctor != -1)
+    if(doctor != ERROR)
     {
         sprintf(message, "|时间\t|上午\t|下午\t|\r\n");
         sprintf(message, "%s-----------------------\r\n", message);
@@ -141,7 +141,7 @@ void platform_patient_get_doc_time(int8_t *message,int8_t *parameter)
 void platform_patient_get_doc_msg(int8_t *message,int8_t *parameter)
 {
     doctor_t *doctor = platform_get_doc(parameter);
-    if(doctor == -1)
+    if(doctor == ERROR)
     {
         sprintf(message, "没有找到这位医生\r\n");
         return;
@@ -229,7 +229,7 @@ void platform_patient_commend(int8_t commend, char *id, char *message, void *par
     int8_t id_n[21];
     time_t timep;
     struct tm *p_tm;
-    if(patient != -1 || strlen(id)==0)
+    if(patient != ERROR || strlen(id)==0)
     {
         switch (commend)
         {
@@ -268,8 +268,8 @@ void platform_patient_commend(int8_t commend, char *id, char *message, void *par
             p_tm=gmtime(&timep);
             sprintf(id_n, "%04d%02d%02d%04d",1900+p_tm->tm_year, 1+p_tm->tm_mon, p_tm->tm_mday, manager.patient_LM.uxNumberOfItems);
             //printf("年%d 月%d 日%d\r\n", 1900+p_tm->tm_year, 1+p_tm->tm_mon, p_tm->tm_mday);
-            patient = platform_add_patient(*p_8, id_n, *(p_8+1), '0', "0", "无");
-            if(patient==-1)
+            patient = platform_add_patient(*p_8, id_n, *(p_8+1), '0', "0", " 无");
+            if(patient==ERROR)
             {
                 sprintf(message, "获取用户失败,原因是生成的id重复,请检查后台的数据\r\n");
             }else

@@ -172,7 +172,7 @@ void platform_doctor_commend(int8_t commend, int8_t *id, int8_t *message, void *
     int32_t *p;
     int8_t (*p_8)[30];
     int8_t id_n[21];
-    if(doctor != -1)
+    if(doctor != ERROR)
     {
         switch (commend)
         {

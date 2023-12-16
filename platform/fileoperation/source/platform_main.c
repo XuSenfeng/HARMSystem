@@ -33,7 +33,7 @@ manager_t manager;
   * @param  id:登录的id
   * @param  passwd:登录的密码
   * @param  choice:登录的选择'1'病人'2'医生'3'管理员
-  * @retval 1成功 -1失败
+  * @retval 1成功 ERROR失败
   */
 int32_t platform_login(int8_t *id, int8_t *passwd, int8_t choice)
 {
@@ -49,7 +49,7 @@ int32_t platform_login(int8_t *id, int8_t *passwd, int8_t choice)
         {
             return 1;
         }else
-            return -1;
+            return ERROR;
         
     }else if(choice == '2')
     {
@@ -66,7 +66,7 @@ int32_t platform_login(int8_t *id, int8_t *passwd, int8_t choice)
             list_to_use = listGET_NEXT(list_to_use);
             doctor = (doctor_t *)listGET_LIST_ITEM_OWNER(list_to_use);
         }
-        return -1;
+        return ERROR;
     }else if(choice == '1')
     {
         //患者
@@ -84,10 +84,10 @@ int32_t platform_login(int8_t *id, int8_t *passwd, int8_t choice)
             list_to_use = listGET_NEXT(list_to_use);
             patient = (patient_t *)listGET_LIST_ITEM_OWNER(list_to_use);
         }
-        return -1;
+        return ERROR;
     }else
     {
-        return (void *)-1;
+        return (void *)ERROR;
     }
 }
 /*********************************************平台设置使用的函数***********************************************/
