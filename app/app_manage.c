@@ -365,13 +365,36 @@ void app_manage_amend_pat(base_data *login_data, int8_t *message)
                 scanf("%s", pat_msg[2]);
             }
 
-            platform_manage_commend(COMMEND_MAN_CHG_DOC_BY_id, message, pat_msg);
+            platform_manage_commend(COMMEND_MAN_CHG_PAT_BY_id, message, pat_msg);
             printf(message);
             system("pause");
         }
     }else{
         system("pause");
     }
+}
+
+void app_manage_show_msg(base_data *login_data, int8_t *message){
+    int8_t choice;
+    system("CLS");
+    printf("********************************************\r\n");
+    printf("*                                          *\r\n");
+    printf("*           请选择你要查看的信息           *\r\n");
+    printf("*                                          *\r\n");
+    printf("********************************************\r\n");
+    printf("1.查看当前最受欢迎的医生\r\n");
+    printf("2.查看当前收益最受欢迎的部门\r\n");
+    printf("请输入您的选择: ");
+    choice = app_get_choice();
+    if(choice == '1')
+    {
+        platform_manage_commend(COMMEND_MAN_GET_OTHER_MSG, message, 1);
+    }else if(choice == '2')
+    {
+        platform_manage_commend(COMMEND_MAN_GET_OTHER_MSG, message, 2);
+    }
+    printf(message);
+    system("pause");
 }
 
 /**
@@ -384,8 +407,8 @@ void app_manage_dealwith(base_data *login_data)
     system("CLS");
     int8_t choice;
     int8_t data[1024] = {0};
-    platform_patient_commend(COMMEND_MAN_GET_SELF_DATA, login_data->id, data);
-    printf("%s", data);
+    platform_manage_commend(COMMEND_MAN_GET_SELF_DATA, data, 0);
+    printf(data);
 
     while(1){
 
@@ -402,6 +425,7 @@ void app_manage_dealwith(base_data *login_data)
         printf("6. 删除某一个病人\r\n");
         printf("7. 修改某一个病人的信息(不能修改id)\r\n");
         printf("8. 从一个文件里面补充现在的文件信息\r\n");
+        printf("9. 查看一些其他信息\r\n");
         printf("0. 退出\r\n");
         printf("您的选择是: ");
         choice = app_get_choice();
@@ -431,7 +455,9 @@ void app_manage_dealwith(base_data *login_data)
         case '8':
             app_manage_add_msg_file(login_data, data);
             break;
-        
+        case '9':
+            app_manage_show_msg(login_data, data);
+            break;        
         default:
             break;
         }

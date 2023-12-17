@@ -26,7 +26,10 @@ extern manager_t manager;
   */
 void platform_get_manage_login_data(int8_t *message)
 {
+    sprintf(message, "\0");
     sprintf(message, "尊敬的 %s 先生/女士 欢迎使用\r\n", manager.login.name);
+    //printf(message);
+    //printf("4444444444");
 }
 /**
   * @brief  获取病人的信息
@@ -190,6 +193,116 @@ void platform_manage_add_doc(int8_t *message, int8_t *parameter)
 
 }
 
+void platform_manage_get_msg(int8_t *message, int parameter)
+{
+    doctor_t *doctor;
+    ListItem_t *list_test, *list_test3, *list_test2;
+    int32_t i, j, t, max, num;
+    one_department_t *department;
+    outpatient_service_t *service;
+    //清空信息
+    sprintf(message, "\0");
+    
+    
+    if(parameter == 1 ){
+        //跳过获取接待过病人最多的医生的信息
+        list_test = listGET_HEAD_ENTRY(&manager.doctors_LM);
+        doctor = listGET_LIST_ITEM_OWNER(list_test);
+        max = doctor->num_had_accept;
+        for(i=0;i<manager.doctors_LM.uxNumberOfItems;i++)
+        {
+            if(doctor->num_had_accept>max)
+                max = doctor->num_had_accept;
+            list_test = listGET_NEXT(list_test);
+            doctor = listGET_LIST_ITEM_OWNER(list_test);
+        }
+        list_test = listGET_NEXT(list_test);
+        doctor = listGET_LIST_ITEM_OWNER(list_test);
+        for(i=0;i<manager.doctors_LM.uxNumberOfItems;i++)
+        {
+            if(doctor->num_had_accept == max)
+                sprintf(message, "%s%s门诊的 %s 医生,目前接待病人 %d个\r\n", 
+                message, doctor->service, 
+                doctor->login.name, doctor->num_had_accept);
+            list_test = listGET_NEXT(list_test);
+            doctor = listGET_LIST_ITEM_OWNER(list_test);
+        }
+    }else if(parameter==2){
+        max = 0;
+        list_test = listGET_HEAD_ENTRY(&manager.departments_LM);
+        department = listGET_LIST_ITEM_OWNER(list_test);
+        for(i=0;i<manager.departments_LM.uxNumberOfItems;i++)
+        {
+            //获取到一个部门
+            num = 0;
+            //遍历部门下面的所有门诊
+            list_test2 = listGET_HEAD_ENTRY(&department->services_LM);
+            service = listGET_LIST_ITEM_OWNER(list_test2);
+            for(j=0;j<department->services_LM.uxNumberOfItems;j++)
+            {
+
+                //获取所有医生
+                list_test3 = listGET_HEAD_ENTRY(&service->doctors_LM);
+                doctor = listGET_LIST_ITEM_OWNER(list_test3);
+                for(t=0;t<service->doctors_LM.uxNumberOfItems;t++)
+                {
+                    num += doctor->num_had_accept;
+                    list_test3 = listGET_NEXT(list_test3);
+                    doctor = listGET_LIST_ITEM_OWNER(list_test3);
+                }
+
+                list_test2 = listGET_NEXT(list_test2);
+                service = listGET_LIST_ITEM_OWNER(list_test2);
+
+                
+            }
+            
+
+            if(max<num)
+                max = num;
+            list_test = listGET_NEXT(list_test);
+            department = listGET_LIST_ITEM_OWNER(list_test);
+
+        }
+        list_test = listGET_HEAD_ENTRY(&manager.departments_LM);
+        department = listGET_LIST_ITEM_OWNER(list_test);
+        for(i=0;i<manager.departments_LM.uxNumberOfItems;i++)
+        {
+            //获取到一个部门
+            num = 0;
+            //遍历部门下面的所有门诊
+            list_test2 = listGET_HEAD_ENTRY(&department->services_LM);
+            service = listGET_LIST_ITEM_OWNER(list_test2);
+            for(j=0;j<department->services_LM.uxNumberOfItems;j++)
+            {
+
+                //获取所有医生
+                list_test3 = listGET_HEAD_ENTRY(&service->doctors_LM);
+                doctor = listGET_LIST_ITEM_OWNER(list_test3);
+                for(t=0;t<service->doctors_LM.uxNumberOfItems;t++)
+                {
+                    num += doctor->num_had_accept;
+                    list_test3 = listGET_NEXT(list_test3);
+                    doctor = listGET_LIST_ITEM_OWNER(list_test3);
+                }
+
+                list_test2 = listGET_NEXT(list_test2);
+                service = listGET_LIST_ITEM_OWNER(list_test2);
+                
+            }
+            
+
+            if(max==num)
+                sprintf(message, "%s%s部门 为最受欢迎的部门,目前接待病人 %d个\r\n", 
+                message, department->name, num);
+
+            list_test = listGET_NEXT(list_test);
+            department = listGET_LIST_ITEM_OWNER(list_test);
+
+        }
+    }
+}
+
 
 /**
   * @brief  这个是管理者的命令接口,根据命令返回信息
@@ -323,6 +436,10 @@ void platform_manage_commend(int8_t commend,int8_t *message, void *parameter)
         }else{
             sprintf(message, "没有这一个病人\r\n");
         }
+        break;
+    case 12:
+        //获取一些其他的信息
+        platform_manage_get_msg(message, parameter);
         break;
     default:
         break;

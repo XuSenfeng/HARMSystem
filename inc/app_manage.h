@@ -22,8 +22,10 @@
 #define COMMEND_MAN_GET_ONE_PAT         9
 //删除某一个病人
 #define COMMEND_MAN_DEL_PAT_BY_id       10
-
-
+//修改某一个病人
+#define COMMEND_MAN_CHG_PAT_BY_id       11
+//修改某一个病人
+#define COMMEND_MAN_GET_OTHER_MSG       12
 
 /*知名专家、主任医师、副主任医师、主治医师和医师。*/
 #define DOC_LEVE_1              "知名专家"
