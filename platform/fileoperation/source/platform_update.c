@@ -96,7 +96,11 @@ void platform_update(){
     fprintf(message_f, "%d\n", manager.doctors_LM.uxNumberOfItems);
     for(i=0;i<manager.doctors_LM.uxNumberOfItems;i++)
     {
-        fprintf(message_f, "%s %s %s %s %s %d %s\n", doctor->login.id, doctor->login.name, doctor->login.passwd, doctor->service, doctor->level, doctor->num_to_accept, doctor->workday);
+        fprintf(message_f, "%s %s %s %s %s %d %s %d %d\n", 
+        doctor->login.id, doctor->login.name, 
+        doctor->login.passwd, doctor->service, doctor->level, 
+        doctor->num_to_accept, doctor->workday, 
+        doctor->num_had_accept, doctor->unit_price);
         list_test = listGET_NEXT(list_test);
         doctor = listGET_LIST_ITEM_OWNER(list_test);
     }
@@ -148,6 +152,7 @@ void platform_department_init(int8_t *file_name)
     int32_t doctor_num;
     int8_t id[21], passwd[30], work[20], status, level[30]; 
     int8_t workday[15];
+    int32_t unit_price, num_had_accept;
     message_f = fopen(file_name, "r");
     fscanf(message_f, "%d", &management_num);
     //printf("*******部门初始化*****%d\r\n", management_num);
@@ -195,8 +200,8 @@ void platform_department_init(int8_t *file_name)
    fscanf(message_f, "%d", &doctor_num);
    for(i=0;i<doctor_num;i++)
    {
-        fscanf(message_f, "%s %s %s %s %s %d %s", id, name, passwd, work, level, &management_num, workday);
-        platform_add_doctor(name, id, passwd, work, level, management_num, workday);
+        fscanf(message_f, "%s %s %s %s %s %d %s %d %d", id, name, passwd, work, level, &management_num, workday, &num_had_accept, &unit_price);
+        platform_add_doctor(name, id, passwd, work, level, management_num, workday, num_had_accept, unit_price);
    }
     //在这里注册病人
     fscanf(message_f, "%d", &patient_num);
@@ -359,7 +364,7 @@ static doctor_t * platform_init_doctor(char *name, char *id, char *passwd , char
   * @param  workday: 工作时间
   * @retval 成功返回医生结构体,失败返回ERROR
   */
-doctor_t * platform_add_doctor(int8_t *name, int8_t *id, int8_t *passwd , int8_t *work, int8_t *level, int32_t num_to_acp, int8_t *workday)
+doctor_t * platform_add_doctor(int8_t *name, int8_t *id, int8_t *passwd , int8_t *work, int8_t *level, int32_t num_to_acp, int8_t *workday, int32_t num_had_accept, int32_t unit_price)
 {
     int32_t i = listCURRENT_LIST_LENGTH(&manager.doctors_LM);
     int8_t flog = 0;
@@ -387,6 +392,9 @@ doctor_t * platform_add_doctor(int8_t *name, int8_t *id, int8_t *passwd , int8_t
     strcpy(doctor->workday, workday);
     strcpy(doctor->level, level);
     doctor->num_to_accept = num_to_acp;
+    doctor->num_had_accept= num_had_accept;
+    doctor->unit_price = unit_price;
+
     return doctor;
 }
 
@@ -484,6 +492,7 @@ int32_t platform_patient_appointment(patient_t *patient, char *doc_id)
         {
             vListInsertEnd(&doctor->patient_LM, &patient->doctor_L);
             patient->doctor_L.xItemValue = 1;
+            doctor->num_had_accept++;
             strcpy(patient->doc_id, doc_id);
             return 1;
         }else
@@ -637,10 +646,11 @@ void *platform_add_patient(int8_t *name, int8_t *id, int8_t *passwd, int8_t stat
         //printf("\r\n添加病人 %s 编号 %s 失败,请不要输入重复的编号的病人...\r\n", name, id);
         return ERROR;
     }
-    strcpy(patient->doc_id, doc_id);
+    
     doctor = platform_get_doc(doc_id);
     if(doctor != ERROR)
     {
+        strcpy(patient->doc_id, doc_id);
         if(status == '1')
         {
             vListInsertEnd(&doctor->patient_LM, &patient->doctor_L);
@@ -649,6 +659,9 @@ void *platform_add_patient(int8_t *name, int8_t *id, int8_t *passwd, int8_t stat
             vListInsertEnd(&doctor->patient_LM, &patient->doctor_L);
             patient->doctor_L.xItemValue = 2;
         }
+    }else{
+        patient->doctor_L.xItemValue = 0;
+        strcpy(patient->doc_id, "0");
     }
     return patient;
     
@@ -686,6 +699,14 @@ void platform_doc_deal_pat(doctor_t *doctor, patient_t *patient, int8_t choice)
         //设置病人存储的医生为0
         patient->doc_id[0] = '0';
         patient->doc_id[1] = '\0';
+        uxListRemove(&patient->doctor_L);
+    }else if(choice == '3')
+    {
+        patient->doctor_L.xItemValue = 0;
+        //设置病人存储的医生为0
+        patient->doc_id[0] = '0';
+        patient->doc_id[1] = '\0';
+        doctor->num_had_accept--;
         uxListRemove(&patient->doctor_L);
     }
 

@@ -130,6 +130,7 @@ void app_get_passwd(char *password)
     while (1) {
     c = _getch(); //用 _getch() 函数输入，字符不会显示在屏幕上
     if (c == '\r') { //遇到回车，表明密码输入结束
+        password[i]=0;
         break; //while 循环的出口
     }
     else if (c == '\b') { //遇到退格，需要删除前一个星号

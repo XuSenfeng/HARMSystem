@@ -66,6 +66,8 @@ typedef struct
     int8_t level[30];       //保存医生的等级的名字
     int8_t workday[15];     //保存医生的工作时间信息
     int32_t num_to_accept;  //保存医生最大的接待量
+    int32_t unit_price;     //医生的预约单价
+    int32_t num_had_accept; //已经接待的病人的数量
 }doctor_t;
 
 //病人的对象

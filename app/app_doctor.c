@@ -100,7 +100,7 @@ void app_doctor_get_pat_msg(base_data *login_data, int8_t *message)
   */
 void app_doctor_deal_pat(base_data *login_data, int8_t *message)
 {
-    int8_t choice;
+    int8_t choice[2];
     int8_t msg_to_pat[100];
     system("CLS");
     printf("即将对现在您的预约的病人进行传唤....\r\n");
@@ -111,8 +111,22 @@ void app_doctor_deal_pat(base_data *login_data, int8_t *message)
     printf("2. 治疗结束,病人不需要进一步治疗\r\n");
     printf("3. 不对他进行治疗,请他去别的地方就诊\r\n");
     printf("4. 暂时先不进行治疗\r\n");
-    choice = app_get_choice();
-    switch (choice)
+    printf("请输入您的选择: ");
+    choice[0] = app_get_choice();
+    printf("请问是否需要给病人追加信息?\r\n");
+    printf("1. 确定\r\n");
+    printf("2. 取消\r\n");
+    printf("请输入您的选择: ");
+    choice[1] = app_get_choice();
+    if(choice[1] == '1')
+    {
+        //printf("\r\n输入的信息里面请务必不要有空格和换行!!!!!!!!\r\n");
+        printf("请输入您想传达的信息: ");
+        scanf("%s", msg_to_pat);
+        platform_doctor_commend(COMMEND_DOC_ADD_PAT_MSG, login_data->id, message, msg_to_pat);
+        printf(message); 
+    }
+    switch (choice[0])
     {
     case '1':
         //更改病人的状态,并发送信息给病人
@@ -137,20 +151,6 @@ void app_doctor_deal_pat(base_data *login_data, int8_t *message)
         break;
     }
     system("pause");
-    printf("请问是否需要给病人追加信息?\r\n");
-    printf("1. 确定\r\n");
-    printf("2. 取消\r\n");
-    printf("请输入您的选择: ");
-    choice = app_get_choice();
-    if(choice == '1')
-    {
-        //printf("\r\n输入的信息里面请务必不要有空格和换行!!!!!!!!\r\n");
-        printf("请输入您想传达的信息: ");
-        scanf("%s", msg_to_pat);
-        platform_doctor_commend(COMMEND_DOC_ADD_PAT_MSG, login_data->id, message, msg_to_pat);
-        printf(message); 
-        system("pause");
-    }
 }
 /**
   * @brief  医生的总的处理函数

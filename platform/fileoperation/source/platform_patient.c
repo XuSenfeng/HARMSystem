@@ -131,13 +131,19 @@ void platform_patient_get_doc_time(int8_t *message,int8_t *parameter)
         sprintf(message, "%s-----------------------\r\n", message);
         for(i=0;i<7;i++)
         {
+            //根据获取到的信息进行打印,以表格的形式进行输出
             sprintf(message, "%s|%s\t|%s\t|%s\t|\r\n", message, weekday[i], doctor->workday[i]=='1'?"√":"X",  doctor->workday[i+1]=='1'?"√":"X");
         }
     }else{
         printf(message, "没有找到这一个医生\r\n");
     }
 }
-
+/**
+  * @brief  获取某一个医生的详细信息
+  * @param  message: 要返回的信息
+  * @param  parameter: 医生的id
+  * @retval 无
+  */
 void platform_patient_get_doc_msg(int8_t *message,int8_t *parameter)
 {
     doctor_t *doctor = platform_get_doc(parameter);
@@ -146,12 +152,19 @@ void platform_patient_get_doc_msg(int8_t *message,int8_t *parameter)
         sprintf(message, "没有找到这位医生\r\n");
         return;
     }
+    //首先获取医生的工作时间
     platform_patient_get_doc_time(message, parameter);
     sprintf(message, "%s医生的名字 %s 所在的部门 %s 还可以接待 %d 个病人\r\n", 
     message, doctor->login.name, 
     doctor->service, 
     doctor->num_to_accept - doctor->patient_LM.uxNumberOfItems);
 }
+
+/**
+  * @brief  获取某一个时间段的医生的数量
+  * @param  parameter: 要获取的时间,实际的32位的数组, 第一个参数存储的是星期几,第二个参数存储的是上午还是下午,通过第三个参数进行返回
+  * @retval 无
+  */
 void platform_patient_get_doc_tim_num(int32_t *parameter)
 {
     doctor_t *doctor;
@@ -181,6 +194,16 @@ void platform_patient_get_doc_tim_num(int32_t *parameter)
     }
     parameter[2] = k;
 }
+
+
+/**
+  * @brief  获取某一个医生的信息通过他的工作时间
+  * @param  message: 要返回的提示信息
+  * @param  begin: 起始的信息数量
+  * @param  num: 要返回的信息的数量
+  * @param  day: 要返回的时间是第几段
+  * @retval 无
+  */
 void platform_patient_getdoc_data_T(int8_t *message, int32_t begin, int32_t num, int32_t day)
 {
     doctor_t *doctor;
@@ -281,10 +304,12 @@ void platform_patient_commend(int8_t commend, char *id, char *message, void *par
             }
             break;
         case 6:
+            //获取医生的信息通过职称
             p = parameter;
             platform_patient_getdoc_data_L(message, *p, *(p+1));
             break;
         case 7:
+            //获取医生的工作时间的信息
             platform_patient_get_doc_time(message, parameter);
             break;
         case 8:
@@ -307,6 +332,7 @@ void platform_patient_commend(int8_t commend, char *id, char *message, void *par
             platform_patient_get_doc_tim_num(parameter);
             break;
         case 11:
+            //获取医生的信息通过时间
             p = parameter;
             platform_patient_getdoc_data_T(message, *p, *(p+1), *(p+2));
             break;

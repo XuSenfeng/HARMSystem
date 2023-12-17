@@ -278,7 +278,8 @@ void app_manage_add_doctor(base_data *login_data, int8_t *message)
         scanf("%s", doc_msg[4]);
         printf("请输入医生的最大接诊数量: ");
         scanf("%d", &doc_msg[5][0]);
-        
+        printf("请输入医生单次接待价格: ");
+        scanf("%d", &doc_msg[5][1]);   
         platform_manage_commend(COMMEND_MAN_ADD_NEW_DOC, message, doc_msg);
         printf(message);
         system("pause");

@@ -29,7 +29,7 @@ void platform_get_doctor_login_data(doctor_t *doctor, int8_t * message)
 {
     sprintf(message, " %s 医生您好\r\n", doctor->login.name);
     sprintf(message, "%s您当前有%d个病人待处理\r\n", message,doctor->patient_LM.uxNumberOfItems);
-    
+    sprintf(message, "%s您当已将接待了 %d 个病人,收益 %d\r\n", message,doctor->num_had_accept, doctor->num_had_accept*doctor->unit_price);
 }
 /**
   * @brief  获取医生的病人部分信息
@@ -99,7 +99,7 @@ void platform_doctor_get_first_pat(doctor_t *doctor, int8_t* message){
   * @param  具体的处理方式 '1'病人需要复诊 '2'病人不需要复诊 '3'让病人去其他的诊室
   * @retval 无
   */
-void platform_doctor_deal_first_pat(doctor_t *doctor,int8_t *message, int8_t choice)
+void platform_doctor_deal_first_pat(doctor_t *doctor,int8_t *message, int8_t* choice)
 {
     ListItem_t *list_pat;
     patient_t *patient;
@@ -108,21 +108,25 @@ void platform_doctor_deal_first_pat(doctor_t *doctor,int8_t *message, int8_t cho
         //有可以治疗的病人
         list_pat = listGET_HEAD_ENTRY(&doctor->patient_LM);
         patient = listGET_LIST_ITEM_OWNER(list_pat);
-        sprintf(patient->message, "\0");
-        if(choice == '1'){
+        if(choice[1]!='1')
+            sprintf(patient->message, "\0");
+        if(choice[0] == '1'){
             platform_doc_deal_pat(doctor, patient, '1');
             sprintf(message, "已经治疗过了,病人会在之后进行复诊\r\n");
-            sprintf(patient->message, "已经治疗过了,在之后进行复诊");
+            if(choice[1]!='1')
+                sprintf(patient->message, " 已经治疗过了,在之后进行复诊\n");
         }
-        else if(choice == '2'){
+        else if(choice[0] == '2'){
             platform_doc_deal_pat(doctor, patient, '2');
             sprintf(message, "已经治疗过了, 恭喜病人痊愈!!!\r\n");
-            sprintf(patient->message, "已经治疗过了,恭喜病人痊愈!!!");
+            if(choice[1]!='1')
+                sprintf(patient->message, " 已经治疗过了,恭喜病人痊愈!!!\n");
         }
-        else if(choice == '3'){
+        else if(choice[0] == '3'){
             platform_doc_deal_pat(doctor, patient, '3');
             sprintf(message, "已经让病人移步其他的诊室\r\n");
-            sprintf(patient->message, "请您移步其他的诊室");
+            if(choice[1]!='1')
+                sprintf(patient->message, " 请您移步其他的诊室\n");
         }
 
     }else
@@ -142,11 +146,13 @@ void platform_doctor_send_msg(doctor_t *doctor,int8_t *message, int8_t *doc_msg)
     patient_t *patient;
     if(doctor->patient_LM.uxNumberOfItems>0)
     {
-        sprintf(patient->message, "\0");
+        
         //有可以传递信息的病人
         list_pat = listGET_HEAD_ENTRY(&doctor->patient_LM);
         patient = listGET_LIST_ITEM_OWNER(list_pat);
-        sprintf(patient->message, "%s", doc_msg);
+        sprintf(patient->message, "\0");
+        sprintf(patient->message, " %s\n", doc_msg);
+
         sprintf(message, "添加成功\r\n");
     }else
     {
