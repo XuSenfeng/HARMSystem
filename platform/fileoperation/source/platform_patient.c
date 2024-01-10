@@ -49,7 +49,7 @@ void platform_patient_getdoc_data_d(int8_t *message, int32_t begin, int32_t num)
             for(t=0;t<service->doctors_LM.uxNumberOfItems;t++)
             {
                 if(k>=begin && k<begin + num)
-                    sprintf(message, "%s\t\t医生 %s 的id是 %s  %s\r\n", message, doctor->login.id, doctor->login.name, doctor->level);
+                    sprintf(message, "%s\t\t医生 %s 的id是 %s  %s\r\n", message, doctor->login.name, doctor->login.id, doctor->level);
                 list_test3 = listGET_NEXT(list_test3);
                 doctor = listGET_LIST_ITEM_OWNER(list_test3);
             }
@@ -297,7 +297,7 @@ void platform_patient_commend(int8_t commend, char *id, char *message, void *par
                 sprintf(message, "获取用户失败,原因是生成的id重复,请检查后台的数据\r\n");
             }else
             {
-                sprintf(message, "用户 %s 申请成功, 您的id是 %s 请记牢作为登录凭证\r\n", patient->login.name, patient->login.id);
+                sprintf(message, "\r\n用户 %s 申请成功, 您的id是 %s 请记牢作为登录凭证\r\n", patient->login.name, patient->login.id);
                 //保存用户信息
                 strcpy(id, patient->login.id);
                 sprintf(message, "%s您当前的密码是 %s\r\n",message,  *(p_8+1));

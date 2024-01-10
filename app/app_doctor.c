@@ -106,7 +106,8 @@ void app_doctor_deal_pat(base_data *login_data, int8_t *message)
     printf("即将对现在您的预约的病人进行传唤....\r\n");
     platform_doctor_commend(COMMEND_DOC_GET_FIRST_PAT, login_data->id, message, 0);
     printf(message);
-    printf("请您确定是否要对他进行治疗\r\n");
+    printf("*********************************\r\n");
+    printf("\r\n请您确定对他进行治疗\r\n");
     printf("1. 进行治疗,需要进一步治疗\r\n");
     printf("2. 治疗结束,病人不需要进一步治疗\r\n");
     printf("3. 不对他进行治疗,请他去别的地方就诊\r\n");

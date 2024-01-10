@@ -46,19 +46,23 @@ void platform_doctor_getpat_data(doctor_t *doctor, int8_t *message, int32_t begi
     int32_t i, k=0;
     ListItem_t *list_test;
     //清空缓冲区
-
+    int8_t status;
     sprintf(message, "\0");
     /*测试代码, 会显示现在已经注册的所有的部门以及门诊*/
     list_test = listGET_HEAD_ENTRY(&doctor->patient_LM);
     patient = listGET_LIST_ITEM_OWNER(list_test);
-    
+    int8_t str1[] = "没有预约";
+    int8_t str2[] = "预约了没有治疗";
+    int8_t str3[] = "等待复诊";
     for(i=0;i<doctor->patient_LM.uxNumberOfItems;i++)
     {
+
         if(k>=begin && k<begin + num)
-            sprintf(message, "%s 病人%d号 %s %s 当前的状态是 %d\r\n", 
+            status = patient->doctor_L.xItemValue;
+            sprintf(message, "%s 病人%d号 %s %s 当前的状态是 %s\r\n", 
             message, k+1,
             patient->login.name, patient->login.id, 
-            patient->doctor_L.xItemValue);
+            status==0?str1:(status==1?str2:str3));
         
         k++;
         list_test = listGET_NEXT(list_test);

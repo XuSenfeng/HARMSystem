@@ -229,9 +229,9 @@ void app_manage_add_msg_file(base_data *login_data, int8_t *message)
     printf("各个部门的个数(数字)\r\n");
     printf("部门个数条信息: 部门名字 部门下面门诊个数 按照个数输入部门名字\r\n");
     printf("医生的个数(数字)\r\n");
-    printf("医生个数条信息: 医生编号 名字 登录密码 门诊 职称 接待的最大病人数\r\n");
+    printf("医生个数条信息: 医生编号 名字 登录密码 门诊 职称 接待的最大病人数 工作时间 已经接待的病人数 当前的工资\r\n");
     printf("病人的个数(数字)\r\n");
-    printf("病人个数条信息: 病人编号 名字 登录密码 当前状态(0 没有预约 1 预约未就诊 2 复诊) 接诊医生编号\r\n");
+    printf("病人个数条信息: 病人编号 名字 登录密码 当前状态(0 没有预约 1 预约未就诊 2 复诊) 接诊医生编号 医生给他的信息\r\n");
     printf("**************************************************\r\n");
     printf("1. 确定\r\n");
     printf("2. 取消\r\n");
@@ -360,13 +360,12 @@ void app_manage_amend_pat(base_data *login_data, int8_t *message)
             printf("2. 登录密码\r\n");
             printf("请输入您的选择: ");
             pat_msg[1][0] = app_get_choice();
-            if(choice == '1' && choice == '2'){
+            if(pat_msg[1][0] == '1' || pat_msg[1][0] == '2'){
                 printf("请输入修改以后的值: ");
                 scanf("%s", pat_msg[2]);
+                platform_manage_commend(COMMEND_MAN_CHG_PAT_BY_id, message, pat_msg);
+                printf(message);
             }
-
-            platform_manage_commend(COMMEND_MAN_CHG_PAT_BY_id, message, pat_msg);
-            printf(message);
             system("pause");
         }
     }else{

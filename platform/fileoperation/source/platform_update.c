@@ -114,6 +114,7 @@ void platform_update(){
         list_test = listGET_NEXT(list_test);
         patient = listGET_LIST_ITEM_OWNER(list_test);
     }  
+    fprintf(message_f, "\n");
     fclose(message_f);
 
 }
@@ -224,6 +225,7 @@ void platform_department_init(int8_t *file_name)
     }
 #endif
 }
+#if DEBUG
 /**
   * @brief  从文件中获取需要的信息
   * @param  无
@@ -256,7 +258,7 @@ void platform_test(void)
     }
 
 }
-
+#endif
 
 /**
   * @brief  初始化一个管理者

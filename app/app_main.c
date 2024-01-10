@@ -25,19 +25,22 @@ int main(void)
     platform_init();
     while(1)
     {
+        //显示欢迎信息同时获取登录选项
         login_data.identity = app_welcome();
         if(login_data.identity != '0'){
             if(app_login(&login_data) == 1)
             {
+                //成功登录
                 app_successed_login(&login_data);
             }
             
         }else
         {
+            //退出
             break;
         }
     }
-    //平台退出函数
+    //平台退出处理函数
     printf("退出\r\n");
     platform_out();
     system("pause");

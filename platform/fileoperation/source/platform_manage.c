@@ -180,7 +180,7 @@ void platform_manage_add_doc(int8_t *message, int8_t *parameter)
     doctor_t *doctor;
     time(&timep);
     p=gmtime(&timep);
-    sprintf(doc_id, "%d%d%d%04d",1900+p->tm_year, 1+p->tm_mon, p->tm_mday, manager.doctors_LM.uxNumberOfItems);
+    sprintf(doc_id, "%04d%02d%02d%04d",1900+p->tm_year, 1+p->tm_mon, p->tm_mday, manager.doctors_LM.uxNumberOfItems);
     //printf("≤‚ ‘ %s %s %s\r\n", doc_id, doc_msg[1], doc_msg[2]);while(1);
     doctor = platform_add_doctor(doc_msg[0], doc_id, doc_msg[3], doc_msg[1], doc_msg[2], doc_msg[5][0], doc_msg[4], 0, doc_msg[5][1]);
     if(doctor != ERROR)
