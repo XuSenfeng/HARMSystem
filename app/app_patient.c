@@ -212,6 +212,9 @@ void app_patient_get_doc_msg(base_data *login_data)
                 if(i<-1)
                     i=-1;
             }
+        }else{
+            printf("没有符合条件的人\r\n");
+            system("pause");
         }
         break;
     default:

@@ -192,7 +192,12 @@ void platform_manage_add_doc(int8_t *message, int8_t *parameter)
     }
 
 }
-
+/**
+  * @brief  获取一些其他的排名
+  * @param  message:返回的显示信息
+  * @param  parameter:获取到的参数 1:受欢迎的医生 2:受欢迎的部门
+  * @retval 无
+  */
 void platform_manage_get_msg(int8_t *message, int parameter)
 {
     doctor_t *doctor;

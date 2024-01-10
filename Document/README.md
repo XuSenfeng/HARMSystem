@@ -1,6 +1,10 @@
 # 医院预约管理系统
 
-作者: 焦浩洋(XvSenfeng)
+> 作者: 焦浩洋(XvSenfeng)
+>
+> 学号: 1231002004
+>
+> 班级: 信息工程学院23级2班, 电子信息专业
 
 日期: 2023-12-6
 
@@ -12,37 +16,75 @@
 
 ## 简介
 
+### 文件
+
++ .git: git管理代码迭代
++ .vscode: 使用vscode的生成的项目文件
++ app: 应用层次的文件存放位置
++ + app_dispose.c, app_main.c最上层的文件,实现app
+        + app_doctor.c, app_dispose.c, app_patient.c, API层, 调用数据库的接口实现各种功能
++ Document:文档
++ inc: app的头文件存放位置
++ output: 生成的文件的存放的位置
++ platform: 平台层, 可以在这里实现不同数据库的平台
++ + fileoperation: 通过文件管理数据, 本次作业实现的
+        + + inc: 头文件位置
+                + source: 源代码
+                + + list.c: 使用到的数据类型操控函数
+                        + platform_main.c, platform_doctor.c, platform_patient.c, platform_manage.c, API层实现需要数据传递的函数
+                        + platform_update.c, 操控信息的底层函数
+        + MySQL: 其他数据库, 待实现
++ Makefile: 编译脚本
+
+### 代码结构
+
 使用四层结构实现医院预约管理系统, 管理app两层以及数据库两层, 只需要移植六个函数就可以在不同的数据库之间移植, 医院的结构, 医生信息,  病人信息全部可以动态加载
 
 ![image-20231211155449983](https://picture-01-1316374204.cos.ap-beijing.myqcloud.com/image/202312111554040.png)
 
-+ 数据库层
+### 数据管理(数据库层)
 
 主要使用链表进行实现, 实现行外部文件加载信息以及在应用平台通过命令进行加载信息, 以及对于数据进行不同方式的修改
 
 所有的部门信息, 除了管理者以外的用户信息从外部的文件进行加载, 请按文件的格式进行提供信息
 
+主要的查询路径有两种
+
 ![image-20231211155337282](https://picture-01-1316374204.cos.ap-beijing.myqcloud.com/image/202312111553389.png)
+
+> 通过管理者查找下面的部门, 之后从部门, 门诊, 医生, 病人的链表依次进行
 
 ![image-20231211155405205](https://picture-01-1316374204.cos.ap-beijing.myqcloud.com/image/202312111554261.png)
 
+> 所有的医生和病人会直接挂载在管理者的对象下面
+
+### 主要使用的数据类型
+
 ![image-20231211155433054](https://picture-01-1316374204.cos.ap-beijing.myqcloud.com/image/202312111554113.png)
 
-+ 应用平台
+> 在文件list.c和.h里面将链表的操作单独抽象出来
+>
+> 主要的操作包括新建链表, 初始化链表, 多种方式的插入, 删除链表, 获取链表的拥有者等
 
-有三种不同的用户, 病人可以选择登录自己的用户或者新建用户, 之后查看现有的医生, 根据医生的id给自己进行预约
+### 上层操作(用户层)
+
+有三种不同的用户
+
+进入以后用户进行选择实际的登录方式
+
+病人可以选择登录自己的用户或者新建用户, 之后查看现有的医生, 根据医生的id给自己进行预约
 
 医生可以查看自己的病人, 对病人进行治疗,并且给病人发送自定义信息
 
-管理员可以添加删除医生, 删除病人, 修改医生或者病人的信息, 查看所有的医生和病人, 或者从文件里面导入新的数据
+管理员可以添加删除医生, 删除病人, 修改医生或者病人的信息, 查看所有的医生和病人, 或者从文件里面导入新的数据等
 
 > 管理员的登录id: 000, 登录密码123456, 不可修改
 
-+ API层(两层)
+### API层(两层)
 
 应用平台调用数据库的API实现应用不同的功能
 
-使用到的函数有六个会在移植部分详细讲解
+使用到的函数有六个会在移植部分讲解
 
 ## 编译
 
@@ -61,6 +103,10 @@ make run
 ```
 
 ## 测试
+
+直接打开output文件夹里面的result.exe文件, 需要在同一个文件夹下面有数据存放的document.txt
+
+![image-20240110135530459](https://picture-01-1316374204.cos.ap-beijing.myqcloud.com/image/202401101355483.png)
 
 ### 主界面
 
@@ -100,25 +146,25 @@ make run
 
 登陆以后会在上面显示当前的用户的状态, 以及是否有医生给他的留言
 
-+ 查看医生信息
+##### 查看医生信息
 
 ![image-20240110125751149](https://picture-01-1316374204.cos.ap-beijing.myqcloud.com/image/202401101257190.png)
 
 有四种方式进行查看医生的信息
 
-![image-20240110125824756](https://picture-01-1316374204.cos.ap-beijing.myqcloud.com/image/202401101258797.png)
+![image-20240110135318830](https://picture-01-1316374204.cos.ap-beijing.myqcloud.com/image/202401101353878.png)
 
 在显示的时候支持向上翻页
 
-+ 预约医生
+##### 预约医生
 
 ![image-20240110125930529](https://picture-01-1316374204.cos.ap-beijing.myqcloud.com/image/202401101259566.png)
 
-+ 查看当前状态
+##### 查看当前状态
 
 ![image-20240110125943131](https://picture-01-1316374204.cos.ap-beijing.myqcloud.com/image/202401101259171.png)
 
-+ 取消预约
+##### 取消预约
 
 ![image-20240110130021819](https://picture-01-1316374204.cos.ap-beijing.myqcloud.com/image/202401101300861.png)
 
@@ -138,11 +184,11 @@ make run
 
 登陆以后会显示当前的状态, 包括等待治疗的病人以及已经治疗过的病人和当前的收益
 
-+ 查看病人信息
+##### 查看病人信息
 
 ![image-20240110130648597](https://picture-01-1316374204.cos.ap-beijing.myqcloud.com/image/202401101306638.png)
 
-+ 对病人进行治疗
+##### 对病人进行治疗
 
 ![image-20240110130859973](https://picture-01-1316374204.cos.ap-beijing.myqcloud.com/image/202401101309014.png)
 
@@ -156,7 +202,7 @@ make run
 
 ![image-20240110131228833](https://picture-01-1316374204.cos.ap-beijing.myqcloud.com/image/202401101312872.png)
 
-+ 显示当前信息
+##### 显示当前信息
 
 ![image-20240110131201702](https://picture-01-1316374204.cos.ap-beijing.myqcloud.com/image/202401101312742.png)
 
@@ -172,13 +218,13 @@ make run
 
 ![image-20240110131404362](https://picture-01-1316374204.cos.ap-beijing.myqcloud.com/image/202401101314404.png)
 
-+ 获取医生信息和病人获取的相同
+##### 获取医生信息和病人获取的相同
 
-+ 获取病人信息
+##### 获取病人信息
 
 ![image-20240110131501929](https://picture-01-1316374204.cos.ap-beijing.myqcloud.com/image/202401101315009.png)
 
-+ 删除医生
+##### 删除医生
 
 ![image-20240110131553429](https://picture-01-1316374204.cos.ap-beijing.myqcloud.com/image/202401101315472.png)
 
@@ -186,19 +232,19 @@ make run
 
 会清除当前医生的病人的预约信息
 
-+ 修改医生信息
+##### 修改医生信息
 
 ![image-20240110131749746](https://picture-01-1316374204.cos.ap-beijing.myqcloud.com/image/202401101317786.png)
 
 可以选择某一个医生的某一条信息
 
-+ 添加医生
+##### 添加医生
 
 ![image-20240110131933586](https://picture-01-1316374204.cos.ap-beijing.myqcloud.com/image/202401101319630.png)
 
 ![image-20240110132716028](https://picture-01-1316374204.cos.ap-beijing.myqcloud.com/image/202401101327072.png)
 
-+ 删除和修改病人信息和医生类似
+##### 删除和修改病人信息和医生类似
 
 ![image-20240110132848269](https://picture-01-1316374204.cos.ap-beijing.myqcloud.com/image/202401101328311.png)
 
@@ -206,13 +252,13 @@ make run
 
 ![image-20240110133259426](https://picture-01-1316374204.cos.ap-beijing.myqcloud.com/image/202401101332481.png)
 
-+ 从文件添加信息
+##### 从文件添加信息
 
 ![image-20240110133423392](https://picture-01-1316374204.cos.ap-beijing.myqcloud.com/image/202401101334434.png)
 
 ![image-20240110133437093](https://picture-01-1316374204.cos.ap-beijing.myqcloud.com/image/202401101334130.png)
 
-+ 查看其他信息
+##### 查看其他信息
 
 ![image-20240110133503642](https://picture-01-1316374204.cos.ap-beijing.myqcloud.com/image/202401101335682.png)
 
@@ -221,26 +267,6 @@ make run
 ### 退出
 
 会把信息更新到记录的文件里面
-
-## 文件介绍
-
-+ .git: git管理代码迭代
-+ .vscode: 使用vscode的生成的项目文件
-+ app: 应用层次的文件存放位置
-+ + app_dispose.c, app_main.c最上层的文件,实现app
-    + app_doctor.c, app_dispose.c, app_patient.c, API层, 调用数据库的接口实现各种功能
-+ Document:文档
-+ inc: app的头文件存放位置
-+ output: 生成的文件的存放的位置
-+ platform: 平台层, 可以在这里实现不同数据库的平台
-+ + fileoperation: 通过文件管理数据, 本次作业实现的
-    + + inc: 头文件位置
-        + source: 源代码
-        + + list.c: 使用到的数据类型操控函数
-            + platform_main.c, platform_doctor.c, platform_patient.c, platform_manage.c, API层实现需要数据传递的函数
-            + platform_update.c, 操控信息的底层函数
-    + MySQL: 其他数据库, 待实现
-+ Makefile: 编译脚本
 
 ## 数据文件格式
 

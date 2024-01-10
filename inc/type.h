@@ -11,5 +11,5 @@ typedef  char int8_t;
 
 #define ERROR               -1
 #define SUCCEED             0
-#define NULL 0
+#define NULL                0
 #endif 
