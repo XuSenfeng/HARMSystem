@@ -83,12 +83,14 @@ void app_doctor_get_pat_msg(base_data *login_data, int8_t *message)
         
         platform_doctor_commend(COMMEND_DOC_GET_PAT_DTA_D, login_data->id, message, parameter);
         printf(message);
-        printf("\r\n 输入u向上翻页 \r\n");
+        printf("\r\n 输入u向上翻页 p退出\r\n");
         page_s = getch();
         if(page_s=='u')
             i-=2;
         if(i<-1)
             i=-1;
+        if(page_s=='p')
+            break;
     }
     system("pause");
 }

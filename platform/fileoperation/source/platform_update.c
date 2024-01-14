@@ -653,13 +653,18 @@ void *platform_add_patient(int8_t *name, int8_t *id, int8_t *passwd, int8_t stat
     if(doctor != ERROR)
     {
         strcpy(patient->doc_id, doc_id);
-        if(status == '1')
-        {
-            vListInsertEnd(&doctor->patient_LM, &patient->doctor_L);
-            patient->doctor_L.xItemValue = 1;
-        }else if(status == '2'){
-            vListInsertEnd(&doctor->patient_LM, &patient->doctor_L);
-            patient->doctor_L.xItemValue = 2;
+        if(doctor->num_to_accept>doctor->patient_LM.uxNumberOfItems){
+            if(status == '1')
+            {
+                vListInsertEnd(&doctor->patient_LM, &patient->doctor_L);
+                patient->doctor_L.xItemValue = 1;
+            }else if(status == '2'){
+                vListInsertEnd(&doctor->patient_LM, &patient->doctor_L);
+                patient->doctor_L.xItemValue = 2;
+            }
+        }else{
+            patient->doctor_L.xItemValue = 0;
+            strcpy(patient->doc_id, "0");
         }
     }else{
         patient->doctor_L.xItemValue = 0;

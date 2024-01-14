@@ -165,7 +165,7 @@ void platform_patient_get_doc_msg(int8_t *message,int8_t *parameter)
   * @param  parameter: 要获取的时间,实际的32位的数组, 第一个参数存储的是星期几,第二个参数存储的是上午还是下午,通过第三个参数进行返回
   * @retval 无
   */
-void platform_patient_get_doc_tim_num(int32_t *parameter)
+void platform_patient_get_doc_tim_num(int8_t *parameter)
 {
     doctor_t *doctor;
     outpatient_service_t *service;
@@ -179,7 +179,6 @@ void platform_patient_get_doc_tim_num(int32_t *parameter)
     }
     day = parameter[0]*2 + parameter[1]-1;
     //清空缓冲区
-    
     //获取第一个医生
     list_test = listGET_HEAD_ENTRY(&manager.doctors_LM);
     doctor = listGET_LIST_ITEM_OWNER(list_test);
@@ -187,7 +186,11 @@ void platform_patient_get_doc_tim_num(int32_t *parameter)
     {
         if(doctor->workday[day]== '1')
         {
-            k++;
+            if(parameter[49]==0 ||
+            (parameter[49]==1 && strcmp(doctor->service, &parameter[4])==0)||
+            (parameter[49]==2 && doctor->num_to_accept > doctor->patient_LM.uxNumberOfItems)){
+                k++;
+            }
         }
         list_test = listGET_NEXT(list_test);
         doctor = listGET_LIST_ITEM_OWNER(list_test);
@@ -204,7 +207,7 @@ void platform_patient_get_doc_tim_num(int32_t *parameter)
   * @param  day: 要返回的时间是第几段
   * @retval 无
   */
-void platform_patient_getdoc_data_T(int8_t *message, int32_t begin, int32_t num, int32_t day)
+void platform_patient_getdoc_data_T(int8_t *message, int8_t begin, int8_t num, int8_t day, int8_t choice, int8_t* service_name)
 {
     doctor_t *doctor;
     outpatient_service_t *service;
@@ -212,21 +215,24 @@ void platform_patient_getdoc_data_T(int8_t *message, int32_t begin, int32_t num,
     ListItem_t *list_test, *list_test2, *list_test3;
     //清空缓冲区
     sprintf(message, "\0");
-
     //获取第一个医生
     list_test = listGET_HEAD_ENTRY(&manager.doctors_LM);
     doctor = listGET_LIST_ITEM_OWNER(list_test);
     for(i=0;i<manager.doctors_LM.uxNumberOfItems;i++)
     {
         if(doctor->workday[day]== '1'){
-            if(k>=begin && k<begin + num)
-                sprintf(message, "%s%s %s 医生职位是 %s 预约id是 %s 还可以接待%d个人\r\n", 
-                message, doctor->level,
-                doctor->login.name, doctor->service, 
-                doctor->login.id, doctor->num_to_accept - doctor->patient_LM.uxNumberOfItems);
-            k++;
-            if(k>=begin + num)
-                break;
+            if(choice==0 ||
+            (choice==1 && strcmp(doctor->service, service_name)==0)||
+            (choice==2 && doctor->num_to_accept > doctor->patient_LM.uxNumberOfItems)){
+                if(k>=begin && k<begin + num)
+                    sprintf(message, "%s%s %s 医生职位是 %s 预约id是 %s 还可以接待%d个人\r\n", 
+                    message, doctor->level,
+                    doctor->login.name, doctor->service, 
+                    doctor->login.id, doctor->num_to_accept - doctor->patient_LM.uxNumberOfItems);
+                k++;
+                if(k>=begin + num)
+                    break;
+            }
         }
         list_test = listGET_NEXT(list_test);
         doctor = listGET_LIST_ITEM_OWNER(list_test);
@@ -248,6 +254,7 @@ void platform_patient_commend(int8_t commend, char *id, char *message, void *par
     int32_t ret;
     patient = platform_get_patient(id);
     int32_t *p;
+    int8_t *p8;
     int8_t (*p_8)[30];
     int8_t id_n[21];
     time_t timep;
@@ -333,8 +340,8 @@ void platform_patient_commend(int8_t commend, char *id, char *message, void *par
             break;
         case 11:
             //获取医生的信息通过时间
-            p = parameter;
-            platform_patient_getdoc_data_T(message, *p, *(p+1), *(p+2));
+            p8 = parameter;
+            platform_patient_getdoc_data_T(message, *p8, *(p8+1), *(p8+2), *(p8+49), (p8+4));
             break;
         default:
             break;

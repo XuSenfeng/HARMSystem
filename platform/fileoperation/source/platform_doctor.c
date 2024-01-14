@@ -29,7 +29,7 @@ void platform_get_doctor_login_data(doctor_t *doctor, int8_t * message)
 {
     sprintf(message, " %s 医生您好\r\n", doctor->login.name);
     sprintf(message, "%s您当前有%d个病人待处理\r\n", message,doctor->patient_LM.uxNumberOfItems);
-    sprintf(message, "%s您当已将接待了 %d 个病人,收益 %d\r\n", message,doctor->num_had_accept, doctor->num_had_accept*doctor->unit_price);
+    sprintf(message, "%s您当已将接取了 %d 个预约,收益 %d\r\n", message,doctor->num_had_accept, doctor->num_had_accept*doctor->unit_price);
 }
 /**
   * @brief  获取医生的病人部分信息
