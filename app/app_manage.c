@@ -75,6 +75,8 @@ void app_manage_aply_pta_message(base_data *login_data, int8_t *message)
     int8_t choice, times, left;
     int8_t page_s;
     int32_t parameter[3], i;
+        int32_t num_page;
+
     platform_manage_commend(COMMEND_MAN_GET_PAT_NUM, 0, &n);
     n -=1;
     system("CLS");
@@ -95,7 +97,7 @@ void app_manage_aply_pta_message(base_data *login_data, int8_t *message)
 
         platform_manage_commend(COMMEND_MAN_GET_PAT_DATA, message, parameter);
         printf(message);
-        printf("\r\n 输入u向上翻页 p退出\r\n");
+            printf("\r\n 第 %d 页  输入u向上翻页 p退出 或者输入n + 页数\r\n", i+1);
         page_s = getch();
         if(page_s=='u')
             i-=2;
@@ -103,6 +105,13 @@ void app_manage_aply_pta_message(base_data *login_data, int8_t *message)
             i=-1;
         if(page_s=='p')
             break;
+        if(page_s=='n'){
+            scanf("%d", &num_page);
+            if(num_page <= times+1 && num_page > 0){
+                i = num_page-2;
+            }else
+                i--;
+        }
         system("CLS");
     }
 }

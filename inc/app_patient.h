@@ -27,7 +27,7 @@
 #define COMMEND_PAT_GET_DOC_DTA_T       11
 
 //显示信息的时候的步长
-#define MESSAGE_STEP                    1
+#define MESSAGE_STEP                    10
 #define MESSAGE_STEP_L                  5
 
 void app_patient_dealwith(base_data *login_data);
