@@ -141,7 +141,9 @@ void app_patient_get_doc_msg_tim(base_data *login_data, int8_t *data, int32_t ch
             platform_patient_commend(COMMEND_PAT_GET_DOC_DTA_T, login_data->id, data, parameter);
 
             printf(data);
-            printf("\r\n 第 %d 页  输入u向上翻页 p退出 或者输入n + 页数\r\n", i+1);
+            printf("\r\n 第 %d 页 共 %d 页  输入u向上翻页 p退出 或者输入n + 页数跳转到对应页\r\n", i+1, times + 1);
+            if(login_data->identity == '1')
+                printf("输入 c 可以直接对医生进行预约\r\n");
             page_s = getch();
             if(page_s=='u')
                 i-=2;
@@ -156,6 +158,11 @@ void app_patient_get_doc_msg_tim(base_data *login_data, int8_t *data, int32_t ch
                 }else
                     i--;
             }
+            if(login_data->identity == '1')
+                if(page_s=='c'){
+                    app_patient_aply_doc(login_data, data);
+                    fflush(stdin);
+                }           
         }
     }else{
         printf("没有符合条件的人\r\n");
@@ -212,7 +219,10 @@ void app_patient_get_doc_msg(base_data *login_data)
                     parameter[1] = MESSAGE_STEP;
                 platform_patient_commend(COMMEND_PAT_GET_DOC_DTA_D, login_data->id, data, parameter);
                 printf(data);
-                printf("\r\n 第 %d 页  输入u向上翻页 p退出 或者输入n + 页数\r\n", i+1);
+            printf("\r\n 第 %d 页 共 %d 页  输入u向上翻页 p退出 或者输入n + 页数\r\n", i+1, times + 1);
+                if(login_data->identity == '1')
+                    printf("输入 c 可以直接对医生进行预约\r\n");
+
                 page_s = getch();
                 //检测是否需要会退回去
                 if(page_s=='u')
@@ -228,6 +238,11 @@ void app_patient_get_doc_msg(base_data *login_data)
                 }else
                     i--;
                 }
+                if(login_data->identity == '1')
+                    if(page_s=='c'){
+                        app_patient_aply_doc(login_data, data);
+                        fflush(stdin);
+                    } 
             }
             break;
         case '2':
@@ -247,7 +262,10 @@ void app_patient_get_doc_msg(base_data *login_data)
                     parameter[1] = MESSAGE_STEP_L;
                 platform_patient_commend(COMMEND_PAT_GET_DOC_DTA_L, login_data->id, data, parameter);
                 printf(data);
-                printf("\r\n 第 %d 页  输入u向上翻页 p退出 或者输入n + 页数\r\n", i+1);
+            printf("\r\n 第 %d 页 共 %d 页  输入u向上翻页 p退出 或者输入n + 页数\r\n", i+1, times + 1);
+            if(login_data->identity == '1')
+            printf("输入 c 可以直接对医生进行预约\r\n");
+
                 page_s = getch();
                 if(page_s=='u')
                     i-=2;
@@ -262,6 +280,11 @@ void app_patient_get_doc_msg(base_data *login_data)
                 }else
                     i--;
                 }
+                if(login_data->identity == '1')
+                    if(page_s=='c'){
+                        app_patient_aply_doc(login_data, data);
+                        fflush(stdin);
+                    }
             }
             break;
         case '3':
@@ -306,7 +329,6 @@ void app_patient_show_self(base_data *login_data, int8_t *message)
   */
 void app_patient_aply_doc(base_data *login_data, int8_t *message)
 {
-    system("CLS");
     int8_t doc_id[21];
     printf("请输入您想预约的医生的id: ");
     scanf("%s", doc_id);

@@ -627,27 +627,14 @@ void *platform_add_patient(int8_t *name, int8_t *id, int8_t *passwd, int8_t stat
     
     doctor_t *doctor;
     int32_t i = listCURRENT_LIST_LENGTH(&manager.patient_LM);
-    int8_t flog = 0;
     ListItem_t *list_pantient = listGET_HEAD_ENTRY(&manager.patient_LM);
     patient_t *patient = listGET_LIST_ITEM_OWNER(list_pantient);
     while(i--)
     {
-        //比较有没有添加过相同的人
-        if(strcmp(id, patient->login.id)==0)
-        {
-            flog=1;
-        }
         list_pantient = listGET_NEXT(list_pantient);
         patient = listGET_LIST_ITEM_OWNER(list_pantient);
     }
-    if(flog==0)
-    {
-        patient = platform_init_patient(name, id, passwd, message);
-    }else
-    {
-        //printf("\r\n添加病人 %s 编号 %s 失败,请不要输入重复的编号的病人...\r\n", name, id);
-        return ERROR;
-    }
+    patient = platform_init_patient(name, id, passwd, message);
     
     doctor = platform_get_doc(doc_id);
     if(doctor != ERROR)

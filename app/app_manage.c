@@ -97,7 +97,7 @@ void app_manage_aply_pta_message(base_data *login_data, int8_t *message)
 
         platform_manage_commend(COMMEND_MAN_GET_PAT_DATA, message, parameter);
         printf(message);
-            printf("\r\n 第 %d 页  输入u向上翻页 p退出 或者输入n + 页数\r\n", i+1);
+        printf("\r\n 第 %d 页 共 %d 页  输入u向上翻页 p退出 或者输入n + 页数\r\n", i+1, times + 1);
         page_s = getch();
         if(page_s=='u')
             i-=2;
@@ -232,8 +232,8 @@ void app_manage_add_msg_file(base_data *login_data, int8_t *message)
     int8_t name[50];
     system("CLS");
     printf("即将从一个文件里面添加信息\r\n");
-    printf("请务必按照给定的文件格式,否则程序会崩溃!!!!!!!!!\r\n");
-    printf("请务必按输入正确的路径, 否则程序会崩溃!!!!!!!!!\r\n");
+    printf("请务必按照给定的文件格式!!!!!!!!!\r\n");
+    printf("请务必按输入正确的路径!!!!!!!!!\r\n");
     printf("文件格式如下\r\n");
     printf("**************************************************\r\n");
     printf("各个部门的个数(数字)\r\n");
@@ -318,14 +318,14 @@ void app_manage_del_patient(base_data *login_data, int8_t *message)
     int8_t choice;
     int8_t pat_id[31];
     system("CLS");
-    printf("现在你可以选择删除一个病人\r\n");
+    printf("现在你可以选择封存一个病人\r\n");
     printf("1. 确定\r\n");
     printf("2. 取消\r\n");
     printf("请输入您的选择: ");
     choice = app_get_choice();
     if(choice == '1')
     {
-        printf("请输入您想要删除的病人的id: ");
+        printf("请输入您想要封存的预约的id: ");
         scanf("%s", pat_id);
         platform_manage_commend(COMMEND_MAN_GET_ONE_PAT, message, pat_id);
         printf(message);
@@ -445,7 +445,7 @@ void app_manage_dealwith(base_data *login_data)
         printf("3. 删除某一个医生\r\n");
         printf("4. 修改某一个医生的信息(不能修改id)\r\n");
         printf("5. 添加一个医生\r\n");
-        printf("6. 删除某一个病人\r\n");
+        printf("6. 封存某一个预约(病人不能通过再这个id进行登录,记录不可再更改)\r\n");
         printf("7. 修改某一个病人的信息(不能修改id)\r\n");
         printf("8. 从一个文件里面补充现在的文件信息\r\n");
         printf("9. 查看一些其他信息\r\n");

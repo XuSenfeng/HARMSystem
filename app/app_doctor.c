@@ -83,7 +83,7 @@ void app_doctor_get_pat_msg(base_data *login_data, int8_t *message)
         
         platform_doctor_commend(COMMEND_DOC_GET_PAT_DTA_D, login_data->id, message, parameter);
         printf(message);
-            printf("\r\n 第 %d 页  输入u向上翻页 p退出 或者输入n + 页数\r\n", i+1);
+            printf("\r\n 第 %d 页 共 %d 页  输入u向上翻页 p退出 或者输入n + 页数\r\n", i+1, times + 1);
         page_s = getch();
         if(page_s=='u')
             i-=2;
@@ -98,8 +98,10 @@ void app_doctor_get_pat_msg(base_data *login_data, int8_t *message)
             }else
                 i--;
         }
+        system("CLS");
     }
-    system("pause");
+
+
 }
 /**
   * @brief  医生对自己的病人进行治疗处理

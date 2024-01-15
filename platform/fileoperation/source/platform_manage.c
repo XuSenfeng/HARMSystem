@@ -417,10 +417,10 @@ void platform_manage_commend(int8_t commend,int8_t *message, void *parameter)
         patient = platform_get_patient(parameter);
         if(patient!=ERROR)
         {
-            sprintf(message, "已经删除病人 %s 编号 %s\r\n",
+            sprintf(message, "已经封存病人 %s 编号 %s\r\n",
             patient->login.name, 
             patient->login.id);
-            platform_del_patient(patient);
+            patient->login.passwd[0] = 0;
         }else{
             sprintf(message, "没有这一个病人\r\n");
         }
